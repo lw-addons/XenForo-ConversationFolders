@@ -12,7 +12,7 @@ class LiamW_ConversationFolders_Installer
 				auto_file_regex VARCHAR(255) NOT NULL DEFAULT '',
 				auto_file_weight INT(10) UNSIGNED NOT NULL DEFAULT 0,
 				conversation_count INT(10) UNSIGNED NOT NULL DEFAULT 0
-			)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_general_ci
 		",
 		'xf_liam_conversation_folder_relations' => "
 			CREATE TABLE xf_liam_conversation_folder_relations (
@@ -22,7 +22,7 @@ class LiamW_ConversationFolders_Installer
 				PRIMARY KEY (conversation_id, user_id),
 				INDEX conversation_id(conversation_id),
 				INDEX conversation_folder_id(conversation_folder_id)
-			)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_general_ci
 		"
 	);
 
@@ -83,6 +83,14 @@ class LiamW_ConversationFolders_Installer
 						ADD auto_file_regex VARCHAR(255) NOT NULL DEFAULT '',
 						ADD auto_file_weight INT(10) UNSIGNED NOT NULL DEFAULT 0
 				");
+			}
+
+			if ($version <= 1030170)
+			{
+				self::_runQuery("ALTER TABLE xf_liam_conversation_folder ENGINE=InnoDb DEFAULT CHARSET=utf8 COLLATE utf8_general_ci");
+				self::_runQuery("ALTER TABLE xf_liam_conversation_folder_relations ENGINE=InnoDb DEFAULT CHARSET=utf8 COLLATE utf8_general_ci");
+
+				self::_runQuery("ALTER TABLE xf_liam_conversation_folder CHANGE title title VARCHAR(50) CHARSET utf8 COLLATE utf8_general_ci NOT NULL, CHANGE description description TEXT CHARSET utf8 COLLATE utf8_general_ci NOT NULL, CHANGE auto_file_regex auto_file_regex VARCHAR(255) CHARSET utf8 COLLATE utf8_general_ci NOT NULL");
 			}
 		}
 

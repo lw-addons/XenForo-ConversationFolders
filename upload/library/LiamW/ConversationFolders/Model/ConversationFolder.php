@@ -86,6 +86,13 @@ class LiamW_ConversationFolders_Model_ConversationFolder extends XenForo_Model
 			$userId = XenForo_Visitor::getUserId();
 		}
 
+		if ($conversationFolderId === 0)
+		{
+			$this->removeConversationFromFolder($conversationFolderId, $userId);
+
+			return;
+		}
+
 		// Select folder when creating & auto file
 		$this->_getDb()
 			->query("INSERT IGNORE INTO xf_liam_conversation_folder_relations (conversation_id, conversation_folder_id, user_id) VALUES (?,?,?)",

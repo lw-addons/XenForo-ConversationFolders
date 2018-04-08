@@ -30,9 +30,10 @@ class LiamW_ConversationFolders_DataWriter_ConversationFolder extends XenForo_Da
 				'auto_file_regex' => array(
 					'type' => self::TYPE_STRING,
 					'default' => '',
+					'maxLength' => 255,
 					'verification' => array(
 						$this,
-						'_verifyRegex'
+						'_verifyAutoFileString'
 					)
 				),
 				'auto_file_weight' => array(
@@ -51,8 +52,6 @@ class LiamW_ConversationFolders_DataWriter_ConversationFolder extends XenForo_Da
 	{
 		if (!$conversationFolderId = $this->_getExistingPrimaryKey($data))
 		{
-			print 'fal';
-
 			return false;
 		}
 
@@ -72,16 +71,18 @@ class LiamW_ConversationFolders_DataWriter_ConversationFolder extends XenForo_Da
 		$this->_getConversationFolderModel()->removeAllConversationsFromFolder($this->get('conversation_folder_id'));
 	}
 
-	protected function _verifyRegex($regex)
+	protected function _verifyAutoFileString(&$autoFileString)
 	{
+		$autoFileString = trim(strval($autoFileString));
+
 		if (XenForo_Application::getOptions()->liam_conversationFolders_auto_file_substring)
 		{
 			return true;
 		}
 
-		if ($regex !== '')
+		if ($autoFileString !== '')
 		{
-			if (preg_match('/\W[\s\w]*e[\s\w]*$/', $regex))
+			if (preg_match('/\W[\s\w]*e[\s\w]*$/', $autoFileString))
 			{
 				$this->error(new XenForo_Phrase('please_enter_valid_regular_expression'), 'auto_file_regex');
 
@@ -91,7 +92,7 @@ class LiamW_ConversationFolders_DataWriter_ConversationFolder extends XenForo_Da
 			{
 				try
 				{
-					preg_match($regex, '');
+					preg_match($autoFileString, '');
 				} catch (Exception $e)
 				{
 					$this->error(new XenForo_Phrase('please_enter_valid_regular_expression'), 'auto_file_regex');

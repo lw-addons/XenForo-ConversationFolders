@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon addon_id="liam_conversationFolders" title="Conversation Folders" version_string="1.3.0" version_id="1030070" url="https://xf-liam.com/categories/conversation-folders.177/" install_callback_class="LiamW_ConversationFolders_Installer" install_callback_method="install" uninstall_callback_class="LiamW_ConversationFolders_Installer" uninstall_callback_method="uninstall">
+<addon addon_id="liam_conversationFolders" title="Conversation Folders" version_string="1.3.1" version_id="1030170" url="https://xf-liam.com/categories/conversation-folders.177/" install_callback_class="LiamW_ConversationFolders_Installer" install_callback_method="install" uninstall_callback_class="LiamW_ConversationFolders_Installer" uninstall_callback_method="uninstall">
   <admin_navigation/>
   <admin_permissions/>
   <admin_style_properties/>
@@ -230,12 +230,12 @@
 .count .unread {
 	font-weight: bold;
 }]]></template>
-    <template title="liam_conversationFolders_delete" version_id="10000" version_string="1.0.0"><![CDATA[<xen:title>{xen:phrase liam_conversationFolders_delete_folder}</xen:title>
+    <template title="liam_conversationFolders_delete" version_id="1030070" version_string="1.3.0"><![CDATA[<xen:title>{xen:phrase liam_conversationFolders_delete_folder}</xen:title>
 
 <form action="{xen:link 'conversations/folder/delete'}" method="post" class="xenForm formOverlay">
 	<p>{xen:phrase liam_conversationFolders_confirm_deletion_of_conversation_folder}:
 	
-	<a href="{xen:link conversations, '', 'conversation_folder_id={$conversationFolder.conversation_folder_id}'}">{$conversationFolder.title}</a></p>
+	<a href="{xen:link conversations/folder, $conversationFolder}">{$conversationFolder.title}</a></p>
 
 	<dl class="ctrlUnit submitUnit">
 		<dt></dt>
@@ -394,8 +394,8 @@ $0]]></replace>
 					<div class="primaryContent menuHeader"><h3>{xen:phrase liam_conversationFolders_folder_tools}</h3></div>
 					<ul class="secondaryContent blockLinksList">
 						<xen:contentcheck>
-							<li><a href="{xen:link 'conversations/folder/edit', '', 'conversation_folder_id={$selectedFolder}'}" class="OverlayTrigger">{xen:phrase liam_conversationFolders_edit_folder}</a></li>
-							<li><a href="{xen:link 'conversations/folder/delete', '', 'conversation_folder_id={$selectedFolder}'}" class="OverlayTrigger">{xen:phrase liam_conversationFolders_delete_folder}</a></li>
+							<li><a href="{xen:link 'conversations/folder/edit', {$conversationFolders.{$selectedFolder}}}" class="OverlayTrigger">{xen:phrase liam_conversationFolders_edit_folder}</a></li>
+							<li><a href="{xen:link 'conversations/folder/delete', {$conversationFolders.{$selectedFolder}}}" class="OverlayTrigger">{xen:phrase liam_conversationFolders_delete_folder}</a></li>
 						</xen:contentcheck>
 					</ul>
 					</xen:if>
@@ -438,7 +438,7 @@ $0]]></replace>
     <modification template="conversation_list" modification_key="liam_conversationFolders_conversation_list_sel_fol" description="" execution_order="10" enabled="1" action="preg_replace">
       <find><![CDATA[/$/]]></find>
       <replace><![CDATA[<script type="text/javascript">
-jQuery.extend(true, {'folderSelected': {xen:if $selectedFolder, '1', '0'}});
+jQuery.extend(true, {'folderSelected': {xen:if '{$selectedFolder} || !{$xenOptions.liam_conversationFolders_show_all}', '1', '0'}});
 </script>]]></replace>
     </modification>
     <modification template="conversation_view" modification_key="liam_conversationFolders_conversation_view" description="" execution_order="10" enabled="1" action="str_replace">
@@ -460,7 +460,7 @@ jQuery.extend(true, {'folderSelected': {xen:if $selectedFolder, '1', '0'}});
     </modification>
     <modification template="conversation_list" modification_key="liam_conversationFolders_conversation_view_drag" description="" execution_order="10" enabled="1" action="preg_replace">
       <find><![CDATA[/$/]]></find>
-      <replace><![CDATA[<xen:if is="{$xenOptions.liam_conversationFolders_enable_drag_drop}">
+      <replace><![CDATA[<xen:if is="{$xenOptions.liam_conversationFolders_enable_drag_drop} && {$conversationFolders}">
 	 <xen:require js="js/conversationfolders/dragdrop.js" />
 </xen:if>]]></replace>
     </modification>
