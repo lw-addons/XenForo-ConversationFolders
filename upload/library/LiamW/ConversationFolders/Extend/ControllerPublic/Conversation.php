@@ -46,12 +46,42 @@ class LiamW_ConversationFolders_Extend_ControllerPublic_Conversation extends XFC
 		$conversationId = $this->_input->filterSingle('conversation_id', XenForo_Input::UINT);
 		$conversation = $this->_getConversationOrError($conversationId);
 
+		$conversationFolderModel = $this->_getConversationFolderModel();
+
 		if ($this->isConfirmedPost())
 		{
 			$folderId = $this->_input->filterSingle('conversation_folder_id', XenForo_Input::UINT);
 
-			$this->_getConversationFolderModel()
+			$conversationFolderModel
 				->moveConversation($conversationId, $folderId);
+
+			if ($this->_noRedirect())
+			{
+				$folderCounts = $conversationFolderModel->getConversationFolderConversationCounts(XenForo_Visitor::getUserId());
+
+				// If show all conversations is enabled, then the count for all conversations won't change when the conversation is moved.
+				if (!XenForo_Application::getOptions()->liam_conversationFolders_show_all)
+				{
+					$folderCounts[0] = array(
+						'conversation_count' => $this->_getConversationModel()
+							->countConversationsForUser(XenForo_Visitor::getUserId(),
+								array('conversation_folder_id' => 0)),
+						'unread_count' => $this->_getConversationModel()
+							->countConversationsForUser(XenForo_Visitor::getUserId(), array(
+								'conversation_folder_id' => 0,
+								'is_unread' => 1
+							))
+					);
+				}
+
+				$viewParams = array(
+					'conversation' => $this->_getConversationOrError($conversationId),
+					'folderCounts' => $folderCounts
+				);
+
+				return $this->responseView('LiamW_ConversationFolders_ViewPublic_Conversation_MoveSuccess',
+					'conversation_list_item', $viewParams);
+			}
 
 			return $this->responseRedirect(XenForo_ControllerResponse_Redirect::SUCCESS,
 				XenForo_Link::buildPublicLink('conversations', $conversation));
@@ -59,7 +89,7 @@ class LiamW_ConversationFolders_Extend_ControllerPublic_Conversation extends XFC
 		else
 		{
 			$viewParams = array(
-				'conversationFolders' => $this->_getConversationFolderModel()->getAllConversationFolders(),
+				'conversationFolders' => $conversationFolderModel->getAllConversationFolders(),
 				'conversation' => $conversation
 			);
 
@@ -229,8 +259,15 @@ class LiamW_ConversationFolders_Extend_ControllerPublic_Conversation extends XFC
 			'conversationFolders' => $conversationFolders,
 			'completeConversationCount' => $this->_getConversationModel()
 				->countConversationsForUser(XenForo_Visitor::getUserId()),
+			'unreadCompleteConversationCount' => $this->_getConversationModel()
+				->countConversationsForUser(XenForo_Visitor::getUserId(), array('is_unread' => 1)),
 			'unfolderedConversationsCount' => $this->_getConversationModel()
-				->countConversationsForUser(XenForo_Visitor::getUserId(), array('conversation_folder_id' => 0))
+				->countConversationsForUser(XenForo_Visitor::getUserId(), array('conversation_folder_id' => 0)),
+			'unreadUnfolderedConversationsCount' => $this->_getConversationModel()
+				->countConversationsForUser(XenForo_Visitor::getUserId(), array(
+					'conversation_folder_id' => 0,
+					'is_unread' => 1
+				))
 		);
 
 		if ($conversationFolderId = $this->_input->filterSingle('conversation_folder_id',

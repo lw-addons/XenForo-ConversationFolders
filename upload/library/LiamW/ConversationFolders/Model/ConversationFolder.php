@@ -4,11 +4,11 @@ class LiamW_ConversationFolders_Model_ConversationFolder extends XenForo_Model
 {
 	public function getAllConversationFolders()
 	{
-		return $this->fetchAllKeyed('
-			SELECT conversation_folder.*
+		return $this->fetchAllKeyed("
+			SELECT conversation_folder.*, (SELECT COUNT(conversation_id) FROM xf_conversation_user WHERE conversation_id IN (SELECT conversation_id FROM xf_liam_conversation_folder_relations WHERE xf_liam_conversation_folder_relations.user_id=xf_conversation_user.owner_user_id AND conversation_folder_id=conversation_folder.conversation_folder_id) AND is_unread =1) AS unread_count
 			FROM xf_liam_conversation_folder AS conversation_folder
-			WHERE user_id=?
-		', 'conversation_folder_id', XenForo_Visitor::getUserId());
+			WHERE conversation_folder.user_id=?
+		", 'conversation_folder_id', XenForo_Visitor::getUserId());
 	}
 
 	public function getConversationFolderById($conversationFolderId)
@@ -26,6 +26,13 @@ class LiamW_ConversationFolders_Model_ConversationFolder extends XenForo_Model
 			->query("UPDATE xf_liam_conversation_folder SET conversation_count=(SELECT COUNT(conversation_folder_id) FROM xf_liam_conversation_folder_relations WHERE xf_liam_conversation_folder_relations.conversation_folder_id=xf_liam_conversation_folder.conversation_folder_id)");
 	}
 
+	public function getConversationFolderConversationCounts($userId)
+	{
+		return $this->_getDb()
+			->fetchAssoc("SELECT conversation_folder_id, conversation_count, (SELECT COUNT(conversation_id) FROM xf_conversation_user WHERE conversation_id IN (SELECT conversation_id FROM xf_liam_conversation_folder_relations WHERE xf_liam_conversation_folder_relations.user_id=xf_conversation_user.owner_user_id AND conversation_folder_id=xf_liam_conversation_folder.conversation_folder_id) AND is_unread =1) AS unread_count FROM xf_liam_conversation_folder WHERE user_id =?",
+				$userId);
+	}
+
 	public function getConversationFoldersWithAutoFileForUser($userId)
 	{
 		return $this->fetchAllKeyed("
@@ -38,12 +45,18 @@ class LiamW_ConversationFolders_Model_ConversationFolder extends XenForo_Model
 
 	public function moveConversation($conversationId, $conversationFolderId, $userId = null)
 	{
+		if (!$userId)
+		{
+			$userId = XenForo_Visitor::getUserId();
+		}
+
 		if (!$conversationFolderId)
 		{
 			// This method deletes the row, which is ideal as it will conserve storage. Not an issue for small sites, but could be for larger ones. (The row also needs to be deleted if the show all option is disabled).
 			$this->removeConversationFromFolder($conversationId, $userId);
 
-			return;
+			return XenForo_Model::create('XenForo_Model_Conversation')
+				->countConversationsForUser($userId, array('conversation_folder_id' => 0));
 		}
 
 		if ($userId === null)
@@ -60,6 +73,10 @@ class LiamW_ConversationFolders_Model_ConversationFolder extends XenForo_Model
 				));
 
 		$this->rebuildFolderCounts();
+
+		return $this->_getDb()
+			->fetchOne("SELECT conversation_count FROM xf_liam_conversation_folder WHERE conversation_folder_id =?",
+				$conversationFolderId);
 	}
 
 	public function addConversationToFolder($conversationId, $conversationFolderId, $userId = null)
