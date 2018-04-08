@@ -1,8 +1,6 @@
 <?php
 
-namespace LiamW\ConversationFolders\Model;
-
-class ConversationFolder extends \XenForo_Model
+class LiamW_ConversationFolders_Model_ConversationFolder extends XenForo_Model
 {
 	public function getAllConversationFolders()
 	{
@@ -10,7 +8,7 @@ class ConversationFolder extends \XenForo_Model
 			SELECT conversation_folder.*
 			FROM xf_liam_conversation_folder AS conversation_folder
 			WHERE user_id=?
-		', 'conversation_folder_id', \XenForo_Visitor::getUserId());
+		', 'conversation_folder_id', XenForo_Visitor::getUserId());
 	}
 
 	public function getConversationFolderById($conversationFolderId)
@@ -50,7 +48,7 @@ class ConversationFolder extends \XenForo_Model
 
 		if ($userId === null)
 		{
-			$userId = \XenForo_Visitor::getUserId();
+			$userId = XenForo_Visitor::getUserId();
 		}
 
 		$this->_getDb()
@@ -68,7 +66,7 @@ class ConversationFolder extends \XenForo_Model
 	{
 		if ($userId === null)
 		{
-			$userId = \XenForo_Visitor::getUserId();
+			$userId = XenForo_Visitor::getUserId();
 		}
 
 		$this->_getDb()->insert('xf_liam_conversation_folder_relations', array(
@@ -84,7 +82,7 @@ class ConversationFolder extends \XenForo_Model
 	{
 		if ($userId === null)
 		{
-			$userId = \XenForo_Visitor::getUserId();
+			$userId = XenForo_Visitor::getUserId();
 		}
 
 		$this->_getDb()
@@ -123,16 +121,21 @@ class ConversationFolder extends \XenForo_Model
 
 		foreach ($recipients as $user)
 		{
-			$user['permissions'] = \XenForo_Permission::unserializePermissions($user['global_permission_cache']);
+			$user['permissions'] = XenForo_Permission::unserializePermissions($user['global_permission_cache']);
 
-			if (!\XenForo_Permission::hasPermission($user['permissions'], 'general', 'conversationFolders_afile'))
+			if (!XenForo_Permission::hasPermission($user['permissions'], 'general', 'conversationFolders_afile'))
 			{
 				continue;
 			}
 
+			$substringMatch = XenForo_Application::getOptions()->liam_conversationFolders_auto_file_substring;
+
 			foreach ($this->getConversationFoldersWithAutoFileForUser($user['user_id']) as $conversationFolder)
 			{
-				if (@preg_match($conversationFolder['auto_file_regex'], $conversationTitle))
+				if (($substringMatch && stripos($conversationTitle,
+							$conversationFolder['auto_file_regex']) !== false) || (!$substringMatch && preg_match($conversationFolder['auto_file_regex'],
+							$conversationTitle))
+				)
 				{
 					$this->addConversationToFolder($conversation['conversation_id'],
 						$conversationFolder['conversation_folder_id'], $user['user_id']);
@@ -141,5 +144,10 @@ class ConversationFolder extends \XenForo_Model
 				}
 			}
 		}
+	}
+
+	public function resetAutoFileSystem()
+	{
+		$this->_getDb()->query("UPDATE xf_liam_conversation_folder SET auto_file_regex=''");
 	}
 }

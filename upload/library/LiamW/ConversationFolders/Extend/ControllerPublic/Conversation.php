@@ -1,16 +1,14 @@
 <?php
 
-namespace LiamW\ConversationFolders\Extend\ControllerPublic;
-
-class Conversation extends XFCP_Conversation
+class LiamW_ConversationFolders_Extend_ControllerPublic_Conversation extends XFCP_LiamW_ConversationFolders_Extend_ControllerPublic_Conversation
 {
 	protected function _postDispatch($controllerResponse, $controllerName, $action)
 	{
 		parent::_postDispatch($controllerResponse, $controllerName, $action);
 
-		if ($controllerResponse instanceof \XenForo_ControllerResponse_View)
+		if ($controllerResponse instanceof XenForo_ControllerResponse_View)
 		{
-			$controllerResponse->params['canUseConversationFolders'] = \XenForo_Visitor::getInstance()
+			$controllerResponse->params['canUseConversationFolders'] = XenForo_Visitor::getInstance()
 				->hasPermission('general', 'liam_conversationFolders');
 		}
 	}
@@ -19,7 +17,7 @@ class Conversation extends XFCP_Conversation
 	{
 		$parent = parent::actionAdd();
 
-		if ($parent instanceof \XenForo_ControllerResponse_View)
+		if ($parent instanceof XenForo_ControllerResponse_View)
 		{
 			$parent->params['conversationFolders'] = $this->_getConversationFolderModel()->getAllConversationFolders();
 		}
@@ -29,10 +27,10 @@ class Conversation extends XFCP_Conversation
 
 	public function actionInsert()
 	{
-		if (\XenForo_Visitor::getInstance()->hasPermission('general', 'liam_conversationFolders'))
+		if (XenForo_Visitor::getInstance()->hasPermission('general', 'liam_conversationFolders'))
 		{
-			\XenForo_Application::set('liam_conversationFolder',
-				$this->_input->filterSingle('conversation_folder_id', \XenForo_Input::UINT));
+			XenForo_Application::set('liam_conversationFolder',
+				$this->_input->filterSingle('conversation_folder_id', XenForo_Input::UINT));
 		}
 
 		return parent::actionInsert();
@@ -42,7 +40,7 @@ class Conversation extends XFCP_Conversation
 	{
 		$parent = parent::actionView();
 
-		if ($parent instanceof \XenForo_ControllerResponse_View)
+		if ($parent instanceof XenForo_ControllerResponse_View)
 		{
 			$parent->params['conversationFolders'] = $this->_getConversationFolderModel()->getAllConversationFolders();
 		}
@@ -52,23 +50,23 @@ class Conversation extends XFCP_Conversation
 
 	public function actionMove()
 	{
-		if (!\XenForo_Visitor::getInstance()->hasPermission('general', 'liam_conversationFolders'))
+		if (!XenForo_Visitor::getInstance()->hasPermission('general', 'liam_conversationFolders'))
 		{
 			return $this->responseNoPermission();
 		}
 
-		$conversationId = $this->_input->filterSingle('conversation_id', \XenForo_Input::UINT);
+		$conversationId = $this->_input->filterSingle('conversation_id', XenForo_Input::UINT);
 		$conversation = $this->_getConversationOrError($conversationId);
 
 		if ($this->isConfirmedPost())
 		{
-			$folderId = $this->_input->filterSingle('conversation_folder_id', \XenForo_Input::UINT);
+			$folderId = $this->_input->filterSingle('conversation_folder_id', XenForo_Input::UINT);
 
 			$this->_getConversationFolderModel()
 				->moveConversation($conversationId, $folderId);
 
-			return $this->responseRedirect(\XenForo_ControllerResponse_Redirect::SUCCESS,
-				\XenForo_Link::buildPublicLink('conversations', $conversation));
+			return $this->responseRedirect(XenForo_ControllerResponse_Redirect::SUCCESS,
+				XenForo_Link::buildPublicLink('conversations', $conversation));
 		}
 		else
 		{
@@ -84,7 +82,7 @@ class Conversation extends XFCP_Conversation
 
 	public function actionFolder()
 	{
-		if (!\XenForo_Visitor::getInstance()
+		if (!XenForo_Visitor::getInstance()
 			->hasPermission('general', 'liam_conversationFolders')
 		)
 		{
@@ -95,7 +93,7 @@ class Conversation extends XFCP_Conversation
 
 		$this->_assertCanUseFolder($conversationFolder);
 
-		$this->canonicalizeRequestUrl(\XenForo_Link::buildPublicLink('conversations/folder', $conversationFolder));
+		$this->canonicalizeRequestUrl(XenForo_Link::buildPublicLink('conversations/folder', $conversationFolder));
 
 		$viewParams = $this->_getConversationListData(array(
 			'conversation_folder_id' => $conversationFolder['conversation_folder_id']
@@ -113,13 +111,13 @@ class Conversation extends XFCP_Conversation
 
 	public function actionFolderNew()
 	{
-		if (!\XenForo_Visitor::getInstance()->hasPermission('general', 'liam_conversationFolders'))
+		if (!XenForo_Visitor::getInstance()->hasPermission('general', 'liam_conversationFolders'))
 		{
 			return $this->responseNoPermission();
 		}
 
 		$viewParams = array(
-			'canUseAutoFile' => \XenForo_Visitor::getInstance()->hasPermission('general', 'conversationFolders_afile')
+			'canUseAutoFile' => XenForo_Visitor::getInstance()->hasPermission('general', 'conversationFolders_afile')
 		);
 
 		return $this->responseView('', 'liam_conversationFolders_edit', $viewParams);
@@ -127,24 +125,24 @@ class Conversation extends XFCP_Conversation
 
 	public function actionFolderEdit()
 	{
-		if (!\XenForo_Visitor::getInstance()->hasPermission('general', 'liam_conversationFolders'))
+		if (!XenForo_Visitor::getInstance()->hasPermission('general', 'liam_conversationFolders'))
 		{
 			return $this->responseNoPermission();
 		}
 
-		$conversationFolderId = $this->_input->filterSingle('conversation_folder_id', \XenForo_Input::UINT);
+		$conversationFolderId = $this->_input->filterSingle('conversation_folder_id', XenForo_Input::UINT);
 		$conversationFolder = $this->_getConversationFolderOrError($conversationFolderId);
 
 		$this->_assertCanUseFolder($conversationFolder);
 
-		if ($conversationFolder['user_id'] != \XenForo_Visitor::getUserId())
+		if ($conversationFolder['user_id'] != XenForo_Visitor::getUserId())
 		{
 			return $this->responseNoPermission();
 		}
 
 		$viewParams = array(
 			'folder' => $conversationFolder,
-			'canUseAutoFile' => \XenForo_Visitor::getInstance()->hasPermission('general', 'conversationFolders_afile')
+			'canUseAutoFile' => XenForo_Visitor::getInstance()->hasPermission('general', 'conversationFolders_afile')
 		);
 
 		return $this->responseView('', 'liam_conversationFolders_edit', $viewParams);
@@ -152,27 +150,27 @@ class Conversation extends XFCP_Conversation
 
 	public function actionFolderSave()
 	{
-		if (!\XenForo_Visitor::getInstance()->hasPermission('general', 'liam_conversationFolders'))
+		if (!XenForo_Visitor::getInstance()->hasPermission('general', 'liam_conversationFolders'))
 		{
 			return $this->responseNoPermission();
 		}
 
-		$conversationFolderId = $this->_input->filterSingle('conversation_folder_id', \XenForo_Input::UINT);
+		$conversationFolderId = $this->_input->filterSingle('conversation_folder_id', XenForo_Input::UINT);
 
 		$input = $this->_input->filter(array(
-			'title' => \XenForo_Input::STRING,
-			'description' => \XenForo_Input::STRING,
+			'title' => XenForo_Input::STRING,
+			'description' => XenForo_Input::STRING,
 		));
 
-		if (\XenForo_Visitor::getInstance()->hasPermission('general', 'conversationFolders_afile'))
+		if (XenForo_Visitor::getInstance()->hasPermission('general', 'conversationFolders_afile'))
 		{
 			$input += $this->_input->filter(array(
-				'auto_file_regex' => \XenForo_Input::STRING,
-				'auto_file_weight' => \XenForo_Input::UINT
+				'auto_file_regex' => XenForo_Input::STRING,
+				'auto_file_weight' => XenForo_Input::UINT
 			));
 		}
 
-		$dw = \XenForo_DataWriter::create('LiamW\ConversationFolders\DataWriter\ConversationFolder');
+		$dw = XenForo_DataWriter::create('LiamW_ConversationFolders_DataWriter_ConversationFolder');
 		if ($conversationFolderId)
 		{
 			$conversationFolder = $this->_getConversationFolderOrError($conversationFolderId);
@@ -181,34 +179,34 @@ class Conversation extends XFCP_Conversation
 
 			$dw->setExistingData($conversationFolder);
 		}
-		$dw->set('user_id', \XenForo_Visitor::getUserId());
+		$dw->set('user_id', XenForo_Visitor::getUserId());
 		$dw->bulkSet($input);
 		$dw->save();
 
-		return $this->responseRedirect(\XenForo_ControllerResponse_Redirect::SUCCESS,
-			\XenForo_Link::buildPublicLink('conversations/folder', $dw->getMergedData()));
+		return $this->responseRedirect(XenForo_ControllerResponse_Redirect::SUCCESS,
+			XenForo_Link::buildPublicLink('conversations/folder', $dw->getMergedData()));
 	}
 
 	public function actionFolderDelete()
 	{
-		if (!\XenForo_Visitor::getInstance()->hasPermission('general', 'liam_conversationFolders'))
+		if (!XenForo_Visitor::getInstance()->hasPermission('general', 'liam_conversationFolders'))
 		{
 			return $this->responseNoPermission();
 		}
 
-		$conversationFolderId = $this->_input->filterSingle('conversation_folder_id', \XenForo_Input::UINT);
+		$conversationFolderId = $this->_input->filterSingle('conversation_folder_id', XenForo_Input::UINT);
 		$conversationFolder = $this->_getConversationFolderOrError($conversationFolderId);
 
 		$this->_assertCanUseFolder($conversationFolder);
 
 		if ($this->isConfirmedPost())
 		{
-			$dw = \XenForo_DataWriter::create('\LiamW\ConversationFolders\DataWriter\ConversationFolder');
+			$dw = XenForo_DataWriter::create('LiamW_ConversationFolders_DataWriter_ConversationFolder');
 			$dw->setExistingData($conversationFolder);
 			$dw->delete();
 
-			return $this->responseRedirect(\XenForo_ControllerResponse_Redirect::SUCCESS,
-				\XenForo_Link::buildPublicLink('conversations'));
+			return $this->responseRedirect(XenForo_ControllerResponse_Redirect::SUCCESS,
+				XenForo_Link::buildPublicLink('conversations'));
 		}
 		else
 		{
@@ -229,7 +227,7 @@ class Conversation extends XFCP_Conversation
 			$fetchOptions['join'] = 0;
 		}
 
-		$fetchOptions['join'] |= \LiamW\ConversationFolders\Extend\Model\Conversation::FETCH_FOLDER;
+		$fetchOptions['join'] |= LiamW_ConversationFolders_Extend_Model_Conversation::FETCH_FOLDER;
 
 		return $fetchOptions;
 	}
@@ -242,24 +240,24 @@ class Conversation extends XFCP_Conversation
 		$viewParams = array(
 			'conversationFolders' => $conversationFolders,
 			'completeConversationCount' => $this->_getConversationModel()
-				->countConversationsForUser(\XenForo_Visitor::getUserId()),
+				->countConversationsForUser(XenForo_Visitor::getUserId()),
 			'unfolderedConversationsCount' => $this->_getConversationModel()
-				->countConversationsForUser(\XenForo_Visitor::getUserId(), array('conversation_folder_id' => 0))
+				->countConversationsForUser(XenForo_Visitor::getUserId(), array('conversation_folder_id' => 0))
 		);
 
 		if ($conversationFolderId = $this->_input->filterSingle('conversation_folder_id',
-			\XenForo_Input::UINT)
+			XenForo_Input::UINT)
 		)
 		{
 			$viewParams['pageNavParams'] = array(
 				'_params' => array(
 					'conversation_folder_id' => $this->_input->filterSingle('conversation_folder_id',
-						\XenForo_Input::UINT)
+						XenForo_Input::UINT)
 				)
 			);
 		}
 
-		if (!isset($extraConditions['conversation_folder_id']) && !\XenForo_Application::getOptions()->liam_conversationFolders_show_all)
+		if (!isset($extraConditions['conversation_folder_id']) && !XenForo_Application::getOptions()->liam_conversationFolders_show_all)
 		{
 			$extraConditions['conversation_folder_id'] = 0;
 		}
@@ -271,14 +269,14 @@ class Conversation extends XFCP_Conversation
 	{
 		if ($conversationFolderId == null)
 		{
-			$conversationFolderId = $this->_input->filterSingle('conversation_folder_id', \XenForo_Input::UINT);
+			$conversationFolderId = $this->_input->filterSingle('conversation_folder_id', XenForo_Input::UINT);
 		}
 
 		$conversationFolder = $this->_getConversationFolderModel()->getConversationFolderById($conversationFolderId);
 
 		if (!$conversationFolder)
 		{
-			throw $this->responseException($this->responseError(new \XenForo_Phrase('liam_conversationFolder_folder_not_found')));
+			throw $this->responseException($this->responseError(new XenForo_Phrase('liam_conversationFolder_folder_not_found')));
 		}
 
 		return $conversationFolder;
@@ -293,17 +291,17 @@ class Conversation extends XFCP_Conversation
 	}
 
 	/**
-	 * @return \LiamW\ConversationFolders\Model\ConversationFolder
+	 * @return LiamW_ConversationFolders_Model_ConversationFolder
 	 */
 	protected function _getConversationFolderModel()
 	{
-		return $this->getModelFromCache('LiamW\ConversationFolders\Model\ConversationFolder');
+		return $this->getModelFromCache('LiamW_ConversationFolders_Model_ConversationFolder');
 	}
 }
 
 if (false)
 {
-	class XFCP_Conversation extends \XenForo_ControllerPublic_Conversation
+	class XFCP_LiamW_ConversationFolders_Extend_ControllerPublic_Conversation extends XenForo_ControllerPublic_Conversation
 	{
 	}
 }

@@ -1,10 +1,8 @@
 <?php
 
-namespace LiamW\ConversationFolders\Extend\Route\Prefix;
-
-class Conversations extends XFCP_Conversations
+class LiamW_ConversationFolders_Extend_Route_Prefix_Conversations extends XFCP_LiamW_ConversationFolders_Extend_Route_Prefix_Conversations
 {
-	public function match($routePath, \Zend_Controller_Request_Http $request, \XenForo_Router $router)
+	public function match($routePath, Zend_Controller_Request_Http $request, XenForo_Router $router)
 	{
 		if (preg_match('/\.\d+\/folder\/?/', $routePath))
 		{
@@ -21,9 +19,9 @@ class Conversations extends XFCP_Conversations
 	{
 		if (isset($data['conversation_folder_id']) && strpos($action, 'folder') !== false)
 		{
-			$action = \XenForo_Link::getPageNumberAsAction($action, $extraParams);
+			$action = XenForo_Link::getPageNumberAsAction($action, $extraParams);
 
-			return \XenForo_Link::buildBasicLinkWithIntegerParam($outputPrefix, $action, $extension, $data,
+			return XenForo_Link::buildBasicLinkWithIntegerParam($outputPrefix, $action, $extension, $data,
 				'conversation_folder_id', 'title');
 		}
 
@@ -34,7 +32,7 @@ class Conversations extends XFCP_Conversations
 
 if (false)
 {
-	class XFCP_Conversations extends \XenForo_Route_Prefix_Conversations
+	class XFCP_LiamW_ConversationFolders_Extend_Route_Prefix_Conversations extends XenForo_Route_Prefix_Conversations
 	{
 	}
 }

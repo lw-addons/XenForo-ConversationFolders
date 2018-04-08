@@ -1,12 +1,10 @@
 <?php
 
-namespace LiamW\ConversationFolders\Extend\ControllerPublic\InlineMod;
-
-class Conversation extends XFCP_Conversation
+class LiamW_ConversationFolders_Extend_ControllerPublic_InlineMod_Conversation extends XFCP_LiamW_ConversationFolders_Extend_ControllerPublic_InlineMod_Conversation
 {
 	public function actionMove()
 	{
-		if (!\XenForo_Visitor::getInstance()->hasPermission('general', 'liam_conversationFolders'))
+		if (!XenForo_Visitor::getInstance()->hasPermission('general', 'liam_conversationFolders'))
 		{
 			return $this->responseNoPermission();
 		}
@@ -14,7 +12,7 @@ class Conversation extends XFCP_Conversation
 		if ($this->isConfirmedPost())
 		{
 			$options = array(
-				'folder' => $this->_input->filterSingle('conversation_folder_id', \XenForo_Input::UINT)
+				'folder' => $this->_input->filterSingle('conversation_folder_id', XenForo_Input::UINT)
 			);
 
 			return $this->executeInlineModAction('moveConversations', $options, array('fromCookie' => false));
@@ -28,7 +26,7 @@ class Conversation extends XFCP_Conversation
 			if (!$conversationIds)
 			{
 				return $this->responseRedirect(
-					\XenForo_ControllerResponse_Redirect::SUCCESS,
+					XenForo_ControllerResponse_Redirect::SUCCESS,
 					$redirect
 				);
 			}
@@ -46,17 +44,17 @@ class Conversation extends XFCP_Conversation
 	}
 
 	/**
-	 * @return \LiamW\ConversationFolders\Model\ConversationFolder
+	 * @return LiamW_ConversationFolders_Model_ConversationFolder
 	 */
 	protected function _getConversationFolderModel()
 	{
-		return $this->getModelFromCache('LiamW\ConversationFolders\Model\ConversationFolder');
+		return $this->getModelFromCache('LiamW_ConversationFolders_Model_ConversationFolder');
 	}
 }
 
 if (false)
 {
-	class XFCP_Conversation extends \XenForo_ControllerPublic_InlineMod_Conversation
+	class XFCP_LiamW_ConversationFolders_Extend_ControllerPublic_InlineMod_Conversation extends XenForo_ControllerPublic_InlineMod_Conversation
 	{
 	}
 }

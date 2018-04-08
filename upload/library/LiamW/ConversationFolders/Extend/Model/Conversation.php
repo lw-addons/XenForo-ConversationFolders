@@ -1,8 +1,6 @@
 <?php
 
-namespace LiamW\ConversationFolders\Extend\Model;
-
-class Conversation extends XFCP_Conversation
+class LiamW_ConversationFolders_Extend_Model_Conversation extends XFCP_LiamW_ConversationFolders_Extend_Model_Conversation
 {
 	const FETCH_FOLDER = 0x10;
 
@@ -47,7 +45,7 @@ class Conversation extends XFCP_Conversation
 
 		if (isset($fetchOptions['join']) && $fetchOptions['join'] & self::FETCH_FOLDER)
 		{
-			$userId = \XenForo_Visitor::getUserId();
+			$userId = XenForo_Visitor::getUserId();
 
 			$selectFields .= ',
 					conversation_folder_relation.conversation_folder_id';
@@ -72,17 +70,17 @@ class Conversation extends XFCP_Conversation
 	}
 
 	/**
-	 * @return \LiamW\ConversationFolders\Model\ConversationFolder
+	 * @return LiamW_ConversationFolders_Model_ConversationFolder
 	 */
 	protected function _getConversationFolderModel()
 	{
-		return $this->getModelFromCache('LiamW\ConversationFolders\Model\ConversationFolder');
+		return $this->getModelFromCache('LiamW_ConversationFolders_Model_ConversationFolder');
 	}
 }
 
 if (false)
 {
-	class XFCP_Conversation extends \XenForo_Model_Conversation
+	class XFCP_LiamW_ConversationFolders_Extend_Model_Conversation extends XenForo_Model_Conversation
 	{
 	}
 }

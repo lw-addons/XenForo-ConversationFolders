@@ -1,8 +1,6 @@
 <?php
 
-namespace LiamW\ConversationFolders;
-
-class Installer
+class LiamW_ConversationFolders_Installer
 {
 	protected static $_tables = array(
 		'xf_liam_conversation_folder' => "
@@ -32,14 +30,14 @@ class Installer
 
 	protected static function _canBeInstalled(&$error)
 	{
-		if (\XenForo_Application::$versionId < 1020070)
+		if (XenForo_Application::$versionId < 1020070)
 		{
 			$error = 'XenForo 1.2.0+ is Required!';
 
 			return false;
 		}
 
-		$hashErrors = \XenForo_Helper_Hash::compareHashes(FileSums::getHashes());
+		$hashErrors = XenForo_Helper_Hash::compareHashes(LiamW_ConversationFolders_FileSums::getHashes());
 
 		if ($hashErrors)
 		{
@@ -62,7 +60,7 @@ class Installer
 	{
 		if (!self::_canBeInstalled($error))
 		{
-			throw new \XenForo_Exception($error, true);
+			throw new XenForo_Exception($error, true);
 		}
 
 		if ($installedAddon)
@@ -140,7 +138,7 @@ class Installer
 	{
 		if ($db == null)
 		{
-			$db = \XenForo_Application::getDb();
+			$db = XenForo_Application::getDb();
 		}
 
 		try

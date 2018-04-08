@@ -1,8 +1,6 @@
 <?php
 
-namespace LiamW\ConversationFolders\DataWriter;
-
-class ConversationFolder extends \XenForo_DataWriter
+class LiamW_ConversationFolders_DataWriter_ConversationFolder extends XenForo_DataWriter
 {
 	protected function _getFields()
 	{
@@ -76,11 +74,16 @@ class ConversationFolder extends \XenForo_DataWriter
 
 	protected function _verifyRegex($regex)
 	{
-		if ($this->isChanged('auto_file_regex') && $regex !== '')
+		if (XenForo_Application::getOptions()->liam_conversationFolders_auto_file_substring)
 		{
-			if (preg_match('/\W[\s\w]*e[\s\w]*$/', $this->get('find')))
+			return true;
+		}
+
+		if ($this->getExisting('auto_file_regex') != $regex && $regex !== '')
+		{
+			if (preg_match('/\W[\s\w]*e[\s\w]*$/', $regex))
 			{
-				$this->error(new \XenForo_Phrase('please_enter_valid_regular_expression'), 'auto_file_regex');
+				$this->error(new XenForo_Phrase('please_enter_valid_regular_expression'), 'auto_file_regex');
 
 				return false;
 			}
@@ -89,9 +92,9 @@ class ConversationFolder extends \XenForo_DataWriter
 				try
 				{
 					preg_match($regex, '');
-				} catch (\ErrorException $e)
+				} catch (Exception $e)
 				{
-					$this->error(new \XenForo_Phrase('please_enter_valid_regular_expression'), 'auto_file_regex');
+					$this->error(new XenForo_Phrase('please_enter_valid_regular_expression'), 'auto_file_regex');
 
 					return false;
 				}
@@ -102,10 +105,10 @@ class ConversationFolder extends \XenForo_DataWriter
 	}
 
 	/**
-	 * @return \LiamW\ConversationFolders\Model\ConversationFolder
+	 * @return LiamW_ConversationFolders_Model_ConversationFolder
 	 */
 	protected function _getConversationFolderModel()
 	{
-		return $this->getModelFromCache('\LiamW\ConversationFolders\Model\ConversationFolder');
+		return $this->getModelFromCache('LiamW_ConversationFolders_Model_ConversationFolder');
 	}
 }
