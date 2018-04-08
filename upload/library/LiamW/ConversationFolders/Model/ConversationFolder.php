@@ -36,12 +36,11 @@ class ConversationFolder extends \XenForo_Model
 		}
 
 		$this->_getDb()
-			->query("INSERT INTO xf_liam_conversation_folder_relations(conversation_id, conversation_folder_id, user_id) VALUES(?,?,?) ON DUPLICATE KEY UPDATE conversation_folder_id=?",
+			->query("INSERT INTO xf_liam_conversation_folder_relations(conversation_id, conversation_folder_id, user_id) VALUES(?,?,?) ON DUPLICATE KEY UPDATE conversation_folder_id=VALUES(conversation_folder_id)",
 				array(
 					$conversationId,
 					$conversationFolderId,
-					$userId,
-					$conversationFolderId
+					$userId
 				));
 
 		$this->rebuildFolderCounts();

@@ -17,9 +17,11 @@ class Installer
 		'xf_liam_conversation_folder_relations' => "
 			CREATE TABLE xf_liam_conversation_folder_relations (
 				conversation_id INT(10) UNSIGNED NOT NULL,
-				conversation_folder_id INT(10) UNSIGNED NOT NULL,
 				user_id INT(10) UNSIGNED NOT NULL,
-				PRIMARY KEY (conversation_id, user_id)
+				conversation_folder_id INT(10) UNSIGNED NOT NULL,
+				PRIMARY KEY (conversation_id, user_id),
+				INDEX conversation_id(conversation_id),
+				INDEX conversation_folder_id(conversation_folder_id)
 			)
 		"
 	);
@@ -59,6 +61,20 @@ class Installer
 		if (!self::_canBeInstalled($error))
 		{
 			throw new \XenForo_Exception($error, true);
+		}
+
+		if ($installedAddon)
+		{
+			$version = $installedAddon['version_id'];
+
+			if ($version < 10002)
+			{
+				self::_runQuery("
+					ALTER TABLE xf_liam_conversation_folder_relations
+						ADD INDEX conversation_id(conversation_id),
+						ADD INDEX conversation_folder_id(conversation_folder_id)
+				");
+			}
 		}
 
 		self::_installTables();

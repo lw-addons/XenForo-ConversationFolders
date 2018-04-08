@@ -21,9 +21,9 @@ class FileSums
 			'library/LiamW/ConversationFolders/Extend/DataWriter/ConversationMaster.php' => 'b4134965ae6e476703ab322b9aaea4f2',
 			'library/LiamW/ConversationFolders/Extend/Model/Conversation.php' => '0b458af8a9a386fc1bd18be2d468ce57',
 			'library/LiamW/ConversationFolders/Extend/Model/InlineMod/Conversation.php' => '90903fb46b4265124798cb564ed4a5f6',
-			'library/LiamW/ConversationFolders/Installer.php' => 'a6cc7ce6de20a31c0e3ab3a55ff7e722',
+			'library/LiamW/ConversationFolders/Installer.php' => '83273795eb31ab4344b19e22ef33c45c',
 			'library/LiamW/ConversationFolders/Listener.php' => 'c7145f42c463701c3197b2540f68e741',
-			'library/LiamW/ConversationFolders/Model/ConversationFolder.php' => 'ea3cc8b1f3dd2d2a29b2bae33213d5fc',
+			'library/LiamW/ConversationFolders/Model/ConversationFolder.php' => '7508ba740b4a3c8848e9f58f2346ba2d',
 		);
 	}
 }
