@@ -98,4 +98,10 @@ class ConversationFolder extends \XenForo_Model
 
 		$this->rebuildFolderCounts();
 	}
+
+	public function removeAllConversationsFromFolder($conversationFolderId)
+	{
+		$this->_getDb()->delete('xf_liam_conversation_folder_relations',
+			'conversation_folder_id = ' . $this->_getDb()->quote($conversationFolderId));
+	}
 }

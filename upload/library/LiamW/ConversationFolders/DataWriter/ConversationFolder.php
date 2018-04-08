@@ -57,8 +57,7 @@ class ConversationFolder extends \XenForo_DataWriter
 
 	protected function _postDelete()
 	{
-		$this->_db->update('xf_conversation_master', array('conversation_folder_id' => 0),
-			'conversation_folder_id = ' . $this->get('conversation_folder_id'));
+		$this->_getConversationFolderModel()->removeAllConversationsFromFolder($this->get('conversation_folder_id'));
 	}
 
 	/**

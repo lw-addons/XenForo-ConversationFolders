@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon addon_id="liam_conversationFolders" title="Conversation Folders" version_string="1.0.0" version_id="10000" url="https://xf-liam.com" install_callback_class="\LiamW\ConversationFolders\Installer" install_callback_method="install" uninstall_callback_class="\LiamW\ConversationFolders\Installer" uninstall_callback_method="uninstall">
+<addon addon_id="liam_conversationFolders" title="Conversation Folders" version_string="1.0.1" version_id="10001" url="https://xf-liam.com/categories/conversaton-folders.177/" install_callback_class="\LiamW\ConversationFolders\Installer" install_callback_method="install" uninstall_callback_class="\LiamW\ConversationFolders\Installer" uninstall_callback_method="uninstall">
   <admin_navigation/>
   <admin_permissions/>
   <admin_style_properties/>
@@ -52,7 +52,7 @@
     <template title="liam_conversationFolders_block" version_id="10000" version_string="1.0.0"><![CDATA[<xen:if is="{$canUseConversationFolders}">
 	<xen:require css="liam_conversationFolders_block.css" />
 
-	<div class="conversationFolders sidebar">
+	<div class="conversationFolders sidebar section">
 		<div class="secondaryContent folderList">
 			<h3>{xen:phrase liam_conversationFolders}</h3>
 			<ol>
@@ -121,7 +121,17 @@
 	border: 1px solid {xen:property primaryLighter};
 	border-radius: 3px;
 	float: right;
-}]]></template>
+}
+
+<xen:if is="{xen:property enableResponsive}">
+@media (max-width:{xen:property maxResponsiveWideWidth})
+{
+	.Responsive .discussionList
+	{
+		margin-left: auto !important;
+	}
+}
+</xen:if>]]></template>
     <template title="liam_conversationFolders_delete" version_id="10000" version_string="1.0.0"><![CDATA[<xen:title>{xen:phrase liam_conversationFolders_delete_folder}</xen:title>
 
 <form action="{xen:link 'conversations/folder/delete'}" method="post" class="xenForm formOverlay">
