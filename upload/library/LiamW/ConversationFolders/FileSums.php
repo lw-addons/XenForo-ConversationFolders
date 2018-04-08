@@ -15,15 +15,16 @@ class FileSums
 	public static function getHashes()
 	{
 		return array(
-			'library/LiamW/ConversationFolders/DataWriter/ConversationFolder.php' => '73f5808034ffdc2dc624701e14ed2bc8',
-			'library/LiamW/ConversationFolders/Extend/ControllerPublic/Conversation.php' => 'b20bf6d8e77cf58572a76ac086266b08',
+			'library/LiamW/ConversationFolders/DataWriter/ConversationFolder.php' => '7005c6dbe48f549d917bf838986b9bcc',
+			'library/LiamW/ConversationFolders/Extend/ControllerPublic/Conversation.php' => 'b393e8928abbf2213e39dc8bd3a26764',
 			'library/LiamW/ConversationFolders/Extend/ControllerPublic/InlineMod/Conversation.php' => 'aae70c0b5335e6f7f21f6bf96622333b',
-			'library/LiamW/ConversationFolders/Extend/DataWriter/ConversationMaster.php' => 'b4134965ae6e476703ab322b9aaea4f2',
-			'library/LiamW/ConversationFolders/Extend/Model/Conversation.php' => '8431fd1157f6c08c51c823d5d7dad7bb',
+			'library/LiamW/ConversationFolders/Extend/DataWriter/ConversationMaster.php' => '907281494f1a7f531b834c32fd18b43c',
+			'library/LiamW/ConversationFolders/Extend/Model/Conversation.php' => 'eaca48604e5a38747b314dc6268b7f99',
 			'library/LiamW/ConversationFolders/Extend/Model/InlineMod/Conversation.php' => '90903fb46b4265124798cb564ed4a5f6',
-			'library/LiamW/ConversationFolders/Installer.php' => '83273795eb31ab4344b19e22ef33c45c',
-			'library/LiamW/ConversationFolders/Listener.php' => 'c7145f42c463701c3197b2540f68e741',
-			'library/LiamW/ConversationFolders/Model/ConversationFolder.php' => 'c7926f4596179bb16bf0b8f9169b3f47',
+			'library/LiamW/ConversationFolders/Extend/Route/Prefix/Conversations.php' => '4450c7b39ea0c0724f156019327a8a3c',
+			'library/LiamW/ConversationFolders/Installer.php' => '9f73fb3b6253d7069923c8e5c6649f84',
+			'library/LiamW/ConversationFolders/Listener.php' => '8b4cffefecca1f005a83a9e9ef995bca',
+			'library/LiamW/ConversationFolders/Model/ConversationFolder.php' => '27280d8a9583dca7769a0bc9e3d8eff2',
 		);
 	}
 }

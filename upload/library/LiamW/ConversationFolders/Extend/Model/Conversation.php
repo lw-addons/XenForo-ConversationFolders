@@ -26,14 +26,7 @@ class Conversation extends XFCP_Conversation
 
 		if (array_key_exists('conversation_folder_id', $conditions))
 		{
-			if ($conditions['conversation_folder_id'] == null)
-			{
-				$sqlConditions[] = 'conversation_folder_relation.conversation_folder_id IS NULL';
-			}
-			else
-			{
-				$sqlConditions[] = 'conversation_folder_relation.conversation_folder_id = ' . $db->quote($conditions['conversation_folder_id']);
-			}
+			$sqlConditions[] = 'IFNULL(conversation_folder_relation.conversation_folder_id,0) = ' . $db->quote($conditions['conversation_folder_id']);
 
 			if (!isset($fetchOptions['join']))
 			{

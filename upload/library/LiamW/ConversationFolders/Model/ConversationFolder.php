@@ -28,6 +28,16 @@ class ConversationFolder extends \XenForo_Model
 			->query("UPDATE xf_liam_conversation_folder SET conversation_count=(SELECT COUNT(conversation_folder_id) FROM xf_liam_conversation_folder_relations WHERE xf_liam_conversation_folder_relations.conversation_folder_id=xf_liam_conversation_folder.conversation_folder_id)");
 	}
 
+	public function getConversationFoldersWithAutoFileForUser($userId)
+	{
+		return $this->fetchAllKeyed("
+			SELECT conversation_folder.*
+			FROM xf_liam_conversation_folder AS conversation_folder
+			WHERE user_id=? AND auto_file_regex <> ''
+			ORDER BY auto_file_weight ASC
+		", 'conversation_folder_id', $userId);
+	}
+
 	public function moveConversation($conversationId, $conversationFolderId, $userId = null)
 	{
 		if (!$conversationFolderId)
@@ -98,5 +108,38 @@ class ConversationFolder extends \XenForo_Model
 	{
 		$this->_getDb()->query('DELETE FROM xf_liam_conversation_folder_relations WHERE conversation_folder_id=?',
 			$conversationFolderId);
+	}
+
+	public function canUseConversationFolder($conversationFolder, &$errorPhraseKey = '', array $viewingUser = null)
+	{
+		$this->standardizeViewingUserReference($viewingUser);
+
+		return ($conversationFolder['user_id'] == $viewingUser['user_id']);
+	}
+
+	public function autoFileConversation(array $conversation, array $recipients)
+	{
+		$conversationTitle = $conversation['title'];
+
+		foreach ($recipients as $user)
+		{
+			$user['permissions'] = \XenForo_Permission::unserializePermissions($user['global_permission_cache']);
+
+			if (!\XenForo_Permission::hasPermission($user['permissions'], 'general', 'conversationFolders_afile'))
+			{
+				continue;
+			}
+
+			foreach ($this->getConversationFoldersWithAutoFileForUser($user['user_id']) as $conversationFolder)
+			{
+				if (preg_match($conversationFolder['auto_file_regex'], $conversationTitle))
+				{
+					$this->addConversationToFolder($conversation['conversation_id'],
+						$conversationFolder['conversation_folder_id'], $user['user_id']);
+
+					break;
+				}
+			}
+		}
 	}
 }

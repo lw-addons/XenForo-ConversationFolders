@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon addon_id="liam_conversationFolders" title="Conversation Folders" version_string="1.0.4" version_id="10004" url="https://xf-liam.com/categories/conversation-folders.177/" install_callback_class="\LiamW\ConversationFolders\Installer" install_callback_method="install" uninstall_callback_class="\LiamW\ConversationFolders\Installer" uninstall_callback_method="uninstall">
+<addon addon_id="liam_conversationFolders" title="Conversation Folders" version_string="1.1.0" version_id="10100" url="https://xf-liam.com/categories/conversation-folders.177/" install_callback_class="\LiamW\ConversationFolders\Installer" install_callback_method="install" uninstall_callback_class="\LiamW\ConversationFolders\Installer" uninstall_callback_method="uninstall">
   <admin_navigation/>
   <admin_permissions/>
   <admin_style_properties/>
@@ -13,6 +13,7 @@
     <listener event_id="load_class_datawriter" execute_order="10" callback_class="\LiamW\ConversationFolders\Listener" callback_method="extendConversationDataWriter" active="1" hint="XenForo_DataWriter_ConversationMaster" description="XenForo_DataWriter_ConversationMaster"/>
     <listener event_id="load_class_model" execute_order="10" callback_class="\LiamW\ConversationFolders\Listener" callback_method="extendConversationModel" active="1" hint="XenForo_Model_Conversation" description="XenForo_Model_Conversation"/>
     <listener event_id="load_class_model" execute_order="10" callback_class="\LiamW\ConversationFolders\Listener" callback_method="extendConversationInlineModModel" active="1" hint="XenForo_Model_InlineMod_Conversation" description="XenForo_Model_InlineMod_Conversation"/>
+    <listener event_id="load_class_route_prefix" execute_order="10" callback_class="LiamW\ConversationFolders\Listener" callback_method="extendConversationsRoute" active="1" hint="XenForo_Route_Prefix_Conversations" description="XenForo_Route_Prefix_Conversations"/>
   </code_event_listeners>
   <cron/>
   <email_templates/>
@@ -29,12 +30,19 @@
   <permissions>
     <permission_groups/>
     <permissions>
-      <permission permission_group_id="general" permission_id="liam_conversationFolders" permission_type="flag" default_value="unset" interface_group_id="generalPermissions" display_order="50000"/>
+      <permission permission_group_id="general" permission_id="conversationFolders_afile" permission_type="flag" default_value="unset" interface_group_id="liam_conversationFolders" display_order="10"/>
+      <permission permission_group_id="general" permission_id="liam_conversationFolders" permission_type="flag" default_value="unset" interface_group_id="liam_conversationFolders" display_order="1"/>
     </permissions>
-    <interface_groups/>
+    <interface_groups>
+      <interface_group interface_group_id="liam_conversationFolders" display_order="50000"/>
+    </interface_groups>
   </permissions>
   <phrases>
     <phrase title="liam_conversationFolders" version_id="10000" version_string="1.0.0"><![CDATA[Conversation Folders]]></phrase>
+    <phrase title="liam_conversationFolders_auto_file_regex" version_id="10004" version_string="1.0.4"><![CDATA[Auto File Regex]]></phrase>
+    <phrase title="liam_conversationFolders_auto_file_regex_explain" version_id="10004" version_string="1.0.4"><![CDATA[If a valid regular expression is entered here, any received conversations with the title matching the entered regular expression will be automatically added to this folder. You must enter the full regular expression, with modifiers.]]></phrase>
+    <phrase title="liam_conversationFolders_auto_file_weight" version_id="10004" version_string="1.0.4"><![CDATA[Auto File Weight]]></phrase>
+    <phrase title="liam_conversationFolders_auto_file_weight_explain" version_id="10004" version_string="1.0.4"><![CDATA[If a conversation title matches multiple auto file regular expressions, it will be added to the folder with the lowest weight value.]]></phrase>
     <phrase title="liam_conversationFolders_confirm_deletion_of_conversation_folder" version_id="10000" version_string="1.0.0"><![CDATA[Confirm deletion of conversation folder]]></phrase>
     <phrase title="liam_conversationFolders_delete_folder" version_id="10000" version_string="1.0.0"><![CDATA[Delete Folder]]></phrase>
     <phrase title="liam_conversationFolders_edit_folder" version_id="10000" version_string="1.0.0"><![CDATA[Edit Folder]]></phrase>
@@ -57,12 +65,14 @@
     <phrase title="option_group_liam_conversationFolders_description" version_id="10003" version_string="1.0.3"><![CDATA[]]></phrase>
     <phrase title="option_liam_conversationFolders_show_all" version_id="10003" version_string="1.0.3"><![CDATA[Enable Show all Conversations]]></phrase>
     <phrase title="option_liam_conversationFolders_show_all_explain" version_id="10003" version_string="1.0.3"><![CDATA[If checked, the main conversation list will show all conversations, if not checked it will show only conversations not assigned to/in a folder.]]></phrase>
+    <phrase title="permission_general_conversationFolders_afile" version_id="10004" version_string="1.0.4"><![CDATA[Can use conversation folders auto file]]></phrase>
     <phrase title="permission_general_liam_conversationFolders" version_id="10000" version_string="1.0.0"><![CDATA[Can use conversation folders]]></phrase>
+    <phrase title="permission_interface_liam_conversationFolders" version_id="10004" version_string="1.0.4"><![CDATA[Conversation Folders Permissions]]></phrase>
   </phrases>
   <route_prefixes/>
   <style_properties/>
   <templates>
-    <template title="liam_conversationFolders_block" version_id="10003" version_string="1.0.3"><![CDATA[<xen:if is="{$canUseConversationFolders}">
+    <template title="liam_conversationFolders_block" version_id="10004" version_string="1.0.4"><![CDATA[<xen:if is="{$canUseConversationFolders}">
 	<xen:require css="liam_conversationFolders_block.css" />
 
 	<div class="conversationFolders sidebar">
@@ -80,7 +90,7 @@
 				</li>
 				<xen:foreach loop="$conversationFolders" value="$folder">
 					<li class="{xen:if '{$folder.conversation_folder_id} == {$selectedFolder}', selected}">
-						<a href="{xen:link conversations, '', 'conversation_folder_id={$folder.conversation_folder_id}'}" {xen:if $folder.description, 'title="{xen:helper striphtml, $folder.description}" class="Tooltip"'}>{$folder.title}</a>
+						<a href="{xen:link conversations/folder, $folder}" {xen:if $folder.description, 'title="{xen:helper striphtml, $folder.description}" class="Tooltip"'}>{$folder.title}</a>
 						<span class="count">{xen:number $folder.conversation_count}</span>
 					</li>
 				</xen:foreach>
@@ -172,7 +182,7 @@
 	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
 	<input type="hidden" name="conversation_folder_id" value="{$conversationFolder.conversation_folder_id}" />
 </form>]]></template>
-    <template title="liam_conversationFolders_edit" version_id="10000" version_string="1.0.0"><![CDATA[<xen:if is="{$folder.conversation_folder_id}"><xen:title>{xen:phrase liam_conversationFolders_edit_folder}: {$folder.title}</xen:title><xen:else /><xen:title>{xen:phrase liam_conversationFolders_new_folder}</xen:title></xen:if>
+    <template title="liam_conversationFolders_edit" version_id="10004" version_string="1.0.4"><![CDATA[<xen:if is="{$folder.conversation_folder_id}"><xen:title>{xen:phrase liam_conversationFolders_edit_folder}: {$folder.title}</xen:title><xen:else /><xen:title>{xen:phrase liam_conversationFolders_new_folder}</xen:title></xen:if>
 
 <form action="{xen:link conversations/folder/save}" class="xenForm formOverlay AutoValidator" data-redirect="on">
 	<dl class="ctrlUnit">
@@ -185,11 +195,30 @@
 		<dd><textarea name="description" id="ctrl_folder_description" class="textCtrl" rows="5">{$folder.description}</textarea></dd>
 	</dl>
 	
+	<xen:if is="{$canUseAutoFile}">
+		<dl class="ctrlUnit">
+			<dt><label for="ctrl_auto_file_regex">{xen:phrase liam_conversationFolders_auto_file_regex}:</label></dt>
+			<dd>
+				<input id="ctrl_auto_file_regex" type="text" name="auto_file_regex" class="textCtrl" value="{$folder.auto_file_regex}" />
+				<p class="explain">{xen:phrase liam_conversationFolders_auto_file_regex_explain}</p>
+			</dd>
+		</dl>
+		
+		<dl class="ctrlUnit">
+			<dt><label for="ctrl_auto_file_weight">{xen:phrase liam_conversationFolders_auto_file_weight}:</label></dt>
+			<dd>
+				<input id="ctrl_auto_file_weight" type="number" name="auto_file_weight" class="textCtrl" value="{$folder.auto_file_weight}" min="0" step="10" />
+				<p class="explain">{xen:phrase liam_conversationFolders_auto_file_weight_explain}</p>
+			</dd>
+		</dl>
+	</xen:if>
+	
 	<dl class="ctrlUnit submitUnit">
 		<dt></dt>
 		<dd><input type="submit" class="button primary" value="{xen:phrase save}" /></dd>
 	</dl>
 	
+	<input type="hidden" name="conversation_folder_id" value="{$folder.conversation_folder_id}" />
 	<input type="hidden" name="_xfConfirm" value="{$visitor.csrf_token_page}" />
 </form>]]></template>
     <template title="liam_conversationFolders_inline_mod_move" version_id="10000" version_string="1.0.0"><![CDATA[<xen:title>{xen:phrase liam_conversationFolders_move}</xen:title>

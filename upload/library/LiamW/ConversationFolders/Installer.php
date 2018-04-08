@@ -11,6 +11,8 @@ class Installer
 				user_id INT(10) UNSIGNED NOT NULL,
 				title VARCHAR(50) NOT NULL,
 				description TEXT NOT NULL,
+				auto_file_regex VARCHAR(255) NOT NULL DEFAULT '',
+				auto_file_weight INT(10) UNSIGNED NOT NULL DEFAULT 0,
 				conversation_count INT(10) UNSIGNED NOT NULL DEFAULT 0
 			)
 		",
@@ -67,12 +69,21 @@ class Installer
 		{
 			$version = $installedAddon['version_id'];
 
-			if ($version < 10002)
+			if ($version <= 10002)
 			{
 				self::_runQuery("
 					ALTER TABLE xf_liam_conversation_folder_relations
 						ADD INDEX conversation_id(conversation_id),
 						ADD INDEX conversation_folder_id(conversation_folder_id)
+				");
+			}
+
+			if ($version <= 10004)
+			{
+				self::_runQuery("
+					ALTER TABLE xf_liam_conversation_folder
+						ADD auto_file_regex VARCHAR(255) NOT NULL DEFAULT '',
+						ADD auto_file_weight INT(10) UNSIGNED NOT NULL DEFAULT 0
 				");
 			}
 		}

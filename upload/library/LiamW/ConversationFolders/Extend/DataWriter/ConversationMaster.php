@@ -13,6 +13,15 @@ class ConversationMaster extends XFCP_ConversationMaster
 			$this->_getConversationFolderModel()->addConversationToFolder($this->get('conversation_id'),
 				\XenForo_Application::get('liam_conversationFolder'));
 		}
+
+		if ($recipients = $this->_getUserModel()
+			->getUsersByIds($this->_newRecipients,
+				array('join' => \XenForo_Model_User::FETCH_USER_FULL | \XenForo_Model_User::FETCH_USER_PERMISSIONS))
+		)
+		{
+			$this->_getConversationFolderModel()->autoFileConversation($this->getMergedData(), $recipients);
+		}
+
 	}
 
 	protected function _postDelete()

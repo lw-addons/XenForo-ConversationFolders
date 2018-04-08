@@ -29,6 +29,18 @@ class ConversationFolder extends \XenForo_DataWriter
 					'type' => self::TYPE_STRING,
 					'default' => ''
 				),
+				'auto_file_regex' => array(
+					'type' => self::TYPE_STRING,
+					'default' => '',
+					'verification' => array(
+						$this,
+						'_verifyRegex'
+					)
+				),
+				'auto_file_weight' => array(
+					'type' => self::TYPE_UINT,
+					'default' => 0
+				),
 				'conversation_count' => array(
 					'type' => self::TYPE_UINT,
 					'default' => 0
@@ -41,6 +53,8 @@ class ConversationFolder extends \XenForo_DataWriter
 	{
 		if (!$conversationFolderId = $this->_getExistingPrimaryKey($data))
 		{
+			print 'fal';
+
 			return false;
 		}
 
@@ -58,6 +72,33 @@ class ConversationFolder extends \XenForo_DataWriter
 	protected function _postDelete()
 	{
 		$this->_getConversationFolderModel()->removeAllConversationsFromFolder($this->get('conversation_folder_id'));
+	}
+
+	protected function _verifyRegex($regex)
+	{
+		if ($this->isChanged('auto_file_regex') && $regex !== '')
+		{
+			if (preg_match('/\W[\s\w]*e[\s\w]*$/', $this->get('find')))
+			{
+				$this->error(new \XenForo_Phrase('please_enter_valid_regular_expression'), 'auto_file_regex');
+
+				return false;
+			}
+			else
+			{
+				try
+				{
+					preg_match($regex, '');
+				} catch (\ErrorException $e)
+				{
+					$this->error(new \XenForo_Phrase('please_enter_valid_regular_expression'), 'auto_file_regex');
+
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
 	/**

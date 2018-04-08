@@ -28,4 +28,9 @@ class Listener
 	{
 		$extend[] = 'LiamW\ConversationFolders\Extend\DataWriter\ConversationMaster';
 	}
+
+	public static function extendConversationsRoute($class, array &$extend)
+	{
+		$extend[] = 'LiamW\ConversationFolders\Extend\Route\Prefix\Conversations';
+	}
 }
