@@ -79,7 +79,7 @@ class LiamW_ConversationFolders_DataWriter_ConversationFolder extends XenForo_Da
 			return true;
 		}
 
-		if ($this->getExisting('auto_file_regex') != $regex && $regex !== '')
+		if ($regex !== '')
 		{
 			if (preg_match('/\W[\s\w]*e[\s\w]*$/', $regex))
 			{

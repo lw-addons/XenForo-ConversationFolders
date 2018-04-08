@@ -40,7 +40,7 @@ class LiamW_ConversationFolders_Model_ConversationFolder extends XenForo_Model
 	{
 		if (!$conversationFolderId)
 		{
-			// This method deletes the row, which is ideal as it will converse storage. Not an issue for small sites, but could be for larger ones. (The row also needs to be deleted if the show all option is disabled).
+			// This method deletes the row, which is ideal as it will conserve storage. Not an issue for small sites, but could be for larger ones. (The row also needs to be deleted if the show all option is disabled).
 			$this->removeConversationFromFolder($conversationId, $userId);
 
 			return;
@@ -69,11 +69,14 @@ class LiamW_ConversationFolders_Model_ConversationFolder extends XenForo_Model
 			$userId = XenForo_Visitor::getUserId();
 		}
 
-		$this->_getDb()->insert('xf_liam_conversation_folder_relations', array(
-			'conversation_id' => $conversationId,
-			'conversation_folder_id' => $conversationFolderId,
-			'user_id' => $userId
-		));
+		// Select folder when creating & auto file
+		$this->_getDb()
+			->query("INSERT IGNORE INTO xf_liam_conversation_folder_relations (conversation_id, conversation_folder_id, user_id) VALUES (?,?,?)",
+				array(
+					$conversationId,
+					$conversationFolderId,
+					$userId
+				));
 
 		$this->rebuildFolderCounts();
 	}
@@ -133,7 +136,7 @@ class LiamW_ConversationFolders_Model_ConversationFolder extends XenForo_Model
 			foreach ($this->getConversationFoldersWithAutoFileForUser($user['user_id']) as $conversationFolder)
 			{
 				if (($substringMatch && stripos($conversationTitle,
-							$conversationFolder['auto_file_regex']) !== false) || (!$substringMatch && preg_match($conversationFolder['auto_file_regex'],
+							$conversationFolder['auto_file_regex']) !== false) || (!$substringMatch && @preg_match($conversationFolder['auto_file_regex'],
 							$conversationTitle))
 				)
 				{

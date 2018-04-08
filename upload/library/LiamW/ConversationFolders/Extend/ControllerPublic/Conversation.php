@@ -36,18 +36,6 @@ class LiamW_ConversationFolders_Extend_ControllerPublic_Conversation extends XFC
 		return parent::actionInsert();
 	}
 
-	public function actionView()
-	{
-		$parent = parent::actionView();
-
-		if ($parent instanceof XenForo_ControllerResponse_View)
-		{
-			$parent->params['conversationFolders'] = $this->_getConversationFolderModel()->getAllConversationFolders();
-		}
-
-		return $parent;
-	}
-
 	public function actionMove()
 	{
 		if (!XenForo_Visitor::getInstance()->hasPermission('general', 'liam_conversationFolders'))
@@ -98,8 +86,6 @@ class LiamW_ConversationFolders_Extend_ControllerPublic_Conversation extends XFC
 		$viewParams = $this->_getConversationListData(array(
 			'conversation_folder_id' => $conversationFolder['conversation_folder_id']
 		));
-
-		$viewParams['selectedFolder'] = $conversationFolder['conversation_folder_id'];
 
 		$this->canonicalizePageNumber(
 			$viewParams['page'], $viewParams['conversationsPerPage'], $viewParams['totalConversations'],
@@ -224,10 +210,12 @@ class LiamW_ConversationFolders_Extend_ControllerPublic_Conversation extends XFC
 
 		if (!isset($fetchOptions['join']))
 		{
-			$fetchOptions['join'] = 0;
+			$fetchOptions['join'] = LiamW_ConversationFolders_Extend_Model_Conversation::FETCH_FOLDER;
 		}
-
-		$fetchOptions['join'] |= LiamW_ConversationFolders_Extend_Model_Conversation::FETCH_FOLDER;
+		else
+		{
+			$fetchOptions['join'] |= LiamW_ConversationFolders_Extend_Model_Conversation::FETCH_FOLDER;
+		}
 
 		return $fetchOptions;
 	}
@@ -261,6 +249,8 @@ class LiamW_ConversationFolders_Extend_ControllerPublic_Conversation extends XFC
 		{
 			$extraConditions['conversation_folder_id'] = 0;
 		}
+
+		$viewParams['selectedFolder'] = isset($extraConditions['conversation_folder_id']) ? $extraConditions['conversation_folder_id'] : false;
 
 		return array_merge_recursive(parent::_getConversationListData($extraConditions), $viewParams);
 	}

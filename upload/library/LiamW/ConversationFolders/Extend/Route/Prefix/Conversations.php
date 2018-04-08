@@ -21,8 +21,10 @@ class LiamW_ConversationFolders_Extend_Route_Prefix_Conversations extends XFCP_L
 		{
 			$action = XenForo_Link::getPageNumberAsAction($action, $extraParams);
 
+			$titleField = isset($data['folder_title']) ? 'folder_title' : 'title';
+
 			return XenForo_Link::buildBasicLinkWithIntegerParam($outputPrefix, $action, $extension, $data,
-				'conversation_folder_id', 'title');
+				'conversation_folder_id', $titleField);
 		}
 
 		return parent::buildLink($originalPrefix, $outputPrefix, $action, $extension, $data,

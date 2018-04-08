@@ -31,4 +31,9 @@ class LiamW_ConversationFolders_Listener
 	{
 		$extend[] = 'LiamW_ConversationFolders_Extend_Route_Prefix_Conversations';
 	}
+
+	public static function widgetRenderers(array &$renderers)
+	{
+		$renderers[] = 'LiamW_ConversationFolders_WidgetRenderer_ConversationFolders';
+	}
 }

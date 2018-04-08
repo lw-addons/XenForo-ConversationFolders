@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon addon_id="liam_conversationFolders" title="Conversation Folders" version_string="1.1.2" version_id="10102" url="https://xf-liam.com/categories/conversation-folders.177/" install_callback_class="LiamW_ConversationFolders_Installer" install_callback_method="install" uninstall_callback_class="LiamW_ConversationFolders_Installer" uninstall_callback_method="uninstall">
+<addon addon_id="liam_conversationFolders" title="Conversation Folders" version_string="1.2.0" version_id="1020070" url="https://xf-liam.com/categories/conversation-folders.177/" install_callback_class="LiamW_ConversationFolders_Installer" install_callback_method="install" uninstall_callback_class="LiamW_ConversationFolders_Installer" uninstall_callback_method="uninstall">
   <admin_navigation/>
   <admin_permissions/>
   <admin_style_properties/>
@@ -14,6 +14,7 @@
     <listener event_id="load_class_model" execute_order="10" callback_class="LiamW_ConversationFolders_Listener" callback_method="extendConversationModel" active="1" hint="XenForo_Model_Conversation" description="XenForo_Model_Conversation"/>
     <listener event_id="load_class_model" execute_order="10" callback_class="LiamW_ConversationFolders_Listener" callback_method="extendConversationInlineModModel" active="1" hint="XenForo_Model_InlineMod_Conversation" description="XenForo_Model_InlineMod_Conversation"/>
     <listener event_id="load_class_route_prefix" execute_order="10" callback_class="LiamW_ConversationFolders_Listener" callback_method="extendConversationsRoute" active="1" hint="XenForo_Route_Prefix_Conversations" description="XenForo_Route_Prefix_Conversations"/>
+    <listener event_id="widget_framework_ready" execute_order="10" callback_class="LiamW_ConversationFolders_Listener" callback_method="widgetRenderers" active="1" hint="" description=""/>
   </code_event_listeners>
   <cron/>
   <email_templates/>
@@ -25,6 +26,12 @@
       <edit_format_params></edit_format_params>
       <sub_options></sub_options>
       <relation group_id="liam_conversationFolders" display_order="10"/>
+    </option>
+    <option option_id="liam_conversationFolders_hide_default_block" edit_format="onoff" data_type="boolean" can_backup="1">
+      <default_value>0</default_value>
+      <edit_format_params></edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="liam_conversationFolders" display_order="1"/>
     </option>
     <option option_id="liam_conversationFolders_show_all" edit_format="onoff" data_type="boolean" can_backup="1">
       <default_value>1</default_value>
@@ -63,7 +70,7 @@
     <phrase title="liam_conversationFolders_move_conversations" version_id="10000" version_string="1.0.0"><![CDATA[Move conversations]]></phrase>
     <phrase title="liam_conversationFolders_move_conversation_to_folder" version_id="10000" version_string="1.0.0"><![CDATA[Move conversation to folder...]]></phrase>
     <phrase title="liam_conversationFolders_move_x_conversations_to_folder" version_id="10000" version_string="1.0.0"><![CDATA[Move {count} conversations to folder...]]></phrase>
-    <phrase title="liam_conversationFolders_new_folder" version_id="10000" version_string="1.0.0"><![CDATA[New Conversation Folder]]></phrase>
+    <phrase title="liam_conversationFolders_new_folder" version_id="10102" version_string="1.1.2"><![CDATA[Create Conversation Folder]]></phrase>
     <phrase title="liam_conversationFolders_no_conversations" version_id="10000" version_string="1.0.0"><![CDATA[There are conversations to display in this folder.]]></phrase>
     <phrase title="liam_conversationFolders_no_folder" version_id="10000" version_string="1.0.0"><![CDATA[no folder]]></phrase>
     <phrase title="liam_conversationFolders_other_conversations" version_id="10003" version_string="1.0.3"><![CDATA[Other Conversations]]></phrase>
@@ -73,6 +80,8 @@
     <phrase title="option_group_liam_conversationFolders_description" version_id="10003" version_string="1.0.3"><![CDATA[]]></phrase>
     <phrase title="option_liam_conversationFolders_auto_file_substring" version_id="10101" version_string="1.1.1"><![CDATA[Auto File Substring Match]]></phrase>
     <phrase title="option_liam_conversationFolders_auto_file_substring_explain" version_id="10101" version_string="1.1.1"><![CDATA[If this is checked, then the auto file system will treat the entered string as a substring check, and not a regular expression check. <b>Disabling this option from enabled will reset all auto file strings!</b>]]></phrase>
+    <phrase title="option_liam_conversationFolders_hide_default_block" version_id="10102" version_string="1.1.2"><![CDATA[Hide Default Block]]></phrase>
+    <phrase title="option_liam_conversationFolders_hide_default_block_explain" version_id="10102" version_string="1.1.2"><![CDATA[If enabled, the default folders block will be hidden. You should enable this if you're using the widget framework block.]]></phrase>
     <phrase title="option_liam_conversationFolders_show_all" version_id="10003" version_string="1.0.3"><![CDATA[Enable Show all Conversations]]></phrase>
     <phrase title="option_liam_conversationFolders_show_all_explain" version_id="10003" version_string="1.0.3"><![CDATA[If checked, the main conversation list will show all conversations, if not checked it will show only conversations not assigned to/in a folder.]]></phrase>
     <phrase title="permission_general_conversationFolders_afile" version_id="10004" version_string="1.0.4"><![CDATA[Can use conversation folders auto file]]></phrase>
@@ -82,12 +91,14 @@
   <route_prefixes/>
   <style_properties/>
   <templates>
-    <template title="liam_conversationFolders_block" version_id="10004" version_string="1.0.4"><![CDATA[<xen:if is="{$canUseConversationFolders}">
+    <template title="liam_conversationFolders_block" version_id="10102" version_string="1.1.2"><![CDATA[<xen:if is="{$canUseConversationFolders} && !{$xenOptions.liam_conversationFolders_hide_default_block}">
 	<xen:require css="liam_conversationFolders_block.css" />
 
 	<div class="conversationFolders sidebar">
 		<div class="secondaryContent folderList">
-			<h3>{xen:phrase liam_conversationFolders}</h3>
+			<div class="sectionHeader">
+				<h3>{xen:phrase liam_conversationFolders}</h3>
+			</div>
 			<ol>
 				<li class="{xen:if '!{$selectedFolder}', selected}">
 					<xen:if is="{$xenOptions.liam_conversationFolders_show_all}">
@@ -111,44 +122,86 @@
 		</div>
 	</div>
 </xen:if>]]></template>
-    <template title="liam_conversationFolders_block.css" version_id="10002" version_string="1.0.2"><![CDATA[.discussionList
-{
-	margin-left: 230px !important;
-}
-
-.conversationFolders {
-	float: left;
-	width: 220px;
-}
-
-	.conversationFolders h3
+    <template title="liam_conversationFolders_block.css" version_id="10102" version_string="1.1.2"><![CDATA[<xen:if is="!{$xenOptions.liam_conversationFolders_hide_default_block}">
+	.discussionList
 	{
-		{xen:property sidebarBlockHeading}
+		margin-left: 230px !important;
 	}
 
-	.conversationFolders .folderList li
+	.conversationFolders {
+		float: left;
+		width: 220px;
+	}
+	
+		.conversationFolders h3
+		{
+			{xen:property sidebarBlockHeading}
+		}
+	
+		.conversationFolders .folderList li
+		{
+			padding: 2px 0 3px;
+			overflow: hidden; zoom: 1;
+		}
+	
+		.conversationFolders .folderList .count
+		{
+			color: {xen:property mutedTextColor};
+			float: right;
+			*float: none;
+			margin-left: 5px;
+		}
+	
+		.conversationFolders .folderList .selected
+		{
+			font-weight: bold;
+		}
+	
+		.conversationFolders .folderList ol ol
+		{
+			margin-left: 15px;
+		}
+		
+	<xen:if is="{xen:property enableResponsive}">
+	@media (max-width:{xen:property maxResponsiveWideWidth})
+	{
+		.discussionList
+		{
+			margin-left: 0px !important;
+		}
+		
+		.conversationFolders
+		{
+			float: none;
+			width: auto;
+		}
+	}
+	</xen:if>
+<xen:else /> <xen:comment>Widget Framework</xen:comment>
+	.folderList li
 	{
 		padding: 2px 0 3px;
 		overflow: hidden; zoom: 1;
 	}
-
-	.conversationFolders .folderList .count
+	
+	.folderList .count
 	{
 		color: {xen:property mutedTextColor};
 		float: right;
 		*float: none;
 		margin-left: 5px;
 	}
-
-	.conversationFolders .folderList .selected
+	
+	.folderList .selected
 	{
 		font-weight: bold;
 	}
-
-	.conversationFolders .folderList ol ol
+	
+	.folderList ol ol
 	{
 		margin-left: 15px;
 	}
+</xen:if>
 
 .conversationFolderBanner {
 	font-size: 10px;
@@ -159,23 +212,7 @@
 	border: 1px solid {xen:property primaryLighter};
 	border-radius: 3px;
 	float: right;
-}
-
-<xen:if is="{xen:property enableResponsive}">
-@media (max-width:{xen:property maxResponsiveWideWidth})
-{
-	.discussionList
-	{
-		margin-left: 0px !important;
-	}
-	
-	.conversationFolders
-	{
-		float: none;
-		width: auto;
-	}
-}
-</xen:if>]]></template>
+}]]></template>
     <template title="liam_conversationFolders_delete" version_id="10000" version_string="1.0.0"><![CDATA[<xen:title>{xen:phrase liam_conversationFolders_delete_folder}</xen:title>
 
 <form action="{xen:link 'conversations/folder/delete'}" method="post" class="xenForm formOverlay">
@@ -262,6 +299,37 @@
 	<input type="hidden" name="redirect" value="{$redirect}" />
 	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
 </form>]]></template>
+    <template title="liam_conversationFolders_wf_block" version_id="10102" version_string="1.1.2"><![CDATA[<xen:if is="{$canUseConversationFolders}">
+	<xen:require css="liam_conversationFolders_block.css" />
+
+	<div class="section widget">
+		<div class="secondaryContent folderList">
+			<div class="sectionHeader">
+				<h3>{xen:phrase liam_conversationFolders}</h3>
+			</div>
+			<ol>
+				<li class="{xen:if '!{$selectedFolder}', selected}">
+					<xen:if is="{$xenOptions.liam_conversationFolders_show_all}">
+						<a href="{xen:link conversations}">{xen:phrase liam_conversationFolders_show_all_conversations}</a>
+						<span class="count">{xen:number $completeConversationCount}</span>
+					<xen:else />
+						<a href="{xen:link conversations}">{xen:phrase liam_conversationFolders_other_conversations}</a>
+						<span class="count">{xen:number $unfolderedConversationsCount}</span>
+					</xen:if>
+				</li>
+				<xen:foreach loop="$conversationFolders" value="$folder">
+					<li class="{xen:if '{$folder.conversation_folder_id} == {$selectedFolder}', selected}">
+						<a href="{xen:link conversations/folder, $folder}" {xen:if $folder.description, 'title="{xen:helper striphtml, $folder.description}" class="Tooltip"'}>{$folder.title}</a>
+						<span class="count">{xen:number $folder.conversation_count}</span>
+					</li>
+				</xen:foreach>
+			</ol>
+		</div>
+		<div class="sectionFooter">
+			<a href="{xen:link conversations/folder/new}" class="OverlayTrigger">{xen:phrase liam_conversationFolders_new_folder}</a>
+		</div>
+	</div>
+</xen:if>]]></template>
   </templates>
   <public_template_modifications>
     <modification template="conversation_add" modification_key="liam_conversationFolders_conversation_add" description="" execution_order="10" enabled="1" action="str_replace">
@@ -341,8 +409,8 @@ $0
     </modification>
     <modification template="conversation_list_item" modification_key="liam_conversationFolders_conversation_list_item" description="" execution_order="10" enabled="1" action="str_replace">
       <find><![CDATA[<h3 class="title">]]></find>
-      <replace><![CDATA[<xen:if is="{$conversation.conversation_folder_id} AND {$canUseConversationFolders}">
-	 <span class="conversationFolderBanner">{$conversationFolders.{$conversation.conversation_folder_id}.title}</span>
+      <replace><![CDATA[<xen:if is="{$conversation.conversation_folder_id} && !{$selectedFolder} && {$canUseConversationFolders}">
+	 <span class="conversationFolderBanner">{$conversation.folder_title}</span>
 </xen:if>
 $0]]></replace>
     </modification>
@@ -358,7 +426,7 @@ $0]]></replace>
       <find><![CDATA[<xen:h1>{$conversation.title}</xen:h1>]]></find>
       <replace><![CDATA[<xen:if is="{$conversation.conversation_folder_id} AND {$canUseConversationFolders}">
 <xen:require css="liam_conversationFolders_block.css" />	
-<xen:set var="$folderTag"><span class="conversationFolderBanner">{$conversationFolders.{$conversation.conversation_folder_id}.title}</span></xen:set>
+<xen:set var="$folderTag"><a href="{xen:link conversations/folder, $conversation}"><span class="conversationFolderBanner">{$conversation.folder_title}</span></a></xen:set>
 </xen:if>
 
 <xen:h1>{$conversation.title} {xen:raw $folderTag}</xen:h1>]]></replace>

@@ -6,12 +6,7 @@ class LiamW_ConversationFolders_Extend_Model_Conversation extends XFCP_LiamW_Con
 
 	public function getConversationForUser($conversationId, $viewingUser, array $fetchOptions = array())
 	{
-		if (!isset($fetchOptions['join']))
-		{
-			$fetchOptions['join'] = 0;
-		}
-
-		$fetchOptions['join'] |= self::FETCH_FOLDER;
+		$this->addFetchOptionJoin($fetchOptions, self::FETCH_FOLDER);
 
 		return parent::getConversationForUser($conversationId, $viewingUser,
 			$fetchOptions);
@@ -22,19 +17,14 @@ class LiamW_ConversationFolders_Extend_Model_Conversation extends XFCP_LiamW_Con
 		$sqlConditions = array();
 		$db = $this->_getDb();
 
-		if (array_key_exists('conversation_folder_id', $conditions))
+		if (isset($conditions['conversation_folder_id']))
 		{
 			$sqlConditions[] = 'IFNULL(conversation_folder_relation.conversation_folder_id,0) = ' . $db->quote($conditions['conversation_folder_id']);
-
-			if (!isset($fetchOptions['join']))
-			{
-				$fetchOptions['join'] = 0;
-			}
-			$fetchOptions['join'] |= self::FETCH_FOLDER;
+			$this->addFetchOptionJoin($fetchOptions, self::FETCH_FOLDER);
 		}
 
-		return $this->getConditionsForClause($sqlConditions) . ' AND ' . parent::prepareConversationConditions($conditions,
-			$fetchOptions);
+		return parent::prepareConversationConditions($conditions,
+			$fetchOptions) . ' AND ' . $this->getConditionsForClause($sqlConditions);
 	}
 
 	public function prepareConversationFetchOptions(array $fetchOptions)
@@ -45,13 +35,17 @@ class LiamW_ConversationFolders_Extend_Model_Conversation extends XFCP_LiamW_Con
 
 		if (isset($fetchOptions['join']) && $fetchOptions['join'] & self::FETCH_FOLDER)
 		{
-			$userId = XenForo_Visitor::getUserId();
-
 			$selectFields .= ',
 					conversation_folder_relation.conversation_folder_id';
 			$joinTables .= '
 					LEFT JOIN xf_liam_conversation_folder_relations AS conversation_folder_relation ON
-						(conversation_master.conversation_id = conversation_folder_relation.conversation_id) AND (conversation_folder_relation.user_id = ' . $userId . ')';
+						(conversation_master.conversation_id = conversation_folder_relation.conversation_id) AND (conversation_folder_relation.user_id = conversation_user.owner_user_id)';
+
+			$selectFields .= ',conversation_folder.title as folder_title';
+			$joinTables .= '
+					LEFT JOIN xf_liam_conversation_folder AS conversation_folder ON
+						(conversation_folder_relation.conversation_folder_id = conversation_folder.conversation_folder_id)
+			';
 		}
 
 		$existingFetchOptions = parent::prepareConversationFetchOptions($fetchOptions);
