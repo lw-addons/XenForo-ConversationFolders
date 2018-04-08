@@ -239,6 +239,8 @@ class Conversation extends XFCP_Conversation
 			'conversationFolders' => $conversationFolders,
 			'completeConversationCount' => $this->_getConversationModel()
 				->countConversationsForUser(\XenForo_Visitor::getUserId()),
+			'unfolderedConversationsCount' => $this->_getConversationModel()
+				->countConversationsForUser(\XenForo_Visitor::getUserId(), array('conversation_folder_id' => null)),
 			'pageNavParams' => array(
 				'_params' => array(
 					'conversation_folder_id' => $this->_input->filterSingle('conversation_folder_id',
@@ -246,6 +248,11 @@ class Conversation extends XFCP_Conversation
 				)
 			)
 		);
+
+		if (!isset($extraConditions['conversation_folder_id']) && !\XenForo_Application::getOptions()->liam_conversationFolders_show_all)
+		{
+			$extraConditions['conversation_folder_id'] = null;
+		}
 
 		return array_merge_recursive(parent::_getConversationListData($extraConditions), $viewParams);
 	}

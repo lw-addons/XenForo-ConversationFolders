@@ -24,9 +24,16 @@ class Conversation extends XFCP_Conversation
 		$sqlConditions = array();
 		$db = $this->_getDb();
 
-		if (!empty($conditions['conversation_folder_id']))
+		if (array_key_exists('conversation_folder_id', $conditions))
 		{
-			$sqlConditions[] = 'conversation_folder_relation.conversation_folder_id = ' . $db->quote($conditions['conversation_folder_id']);
+			if ($conditions['conversation_folder_id'] == null)
+			{
+				$sqlConditions[] = 'conversation_folder_relation.conversation_folder_id IS NULL';
+			}
+			else
+			{
+				$sqlConditions[] = 'conversation_folder_relation.conversation_folder_id = ' . $db->quote($conditions['conversation_folder_id']);
+			}
 
 			if (!isset($fetchOptions['join']))
 			{

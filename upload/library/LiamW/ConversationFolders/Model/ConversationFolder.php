@@ -30,6 +30,14 @@ class ConversationFolder extends \XenForo_Model
 
 	public function moveConversation($conversationId, $conversationFolderId, $userId = null)
 	{
+		if (!$conversationFolderId)
+		{
+			// This method deletes the row, which is ideal as it will converse storage. Not an issue for small sites, but could be for larger ones. (The row also needs to be deleted if the show all option is disabled).
+			$this->removeConversationFromFolder($conversationId, $userId);
+
+			return;
+		}
+
 		if ($userId === null)
 		{
 			$userId = \XenForo_Visitor::getUserId();
@@ -44,8 +52,6 @@ class ConversationFolder extends \XenForo_Model
 				));
 
 		$this->rebuildFolderCounts();
-
-		return true;
 	}
 
 	public function addConversationToFolder($conversationId, $conversationFolderId, $userId = null)
@@ -61,11 +67,7 @@ class ConversationFolder extends \XenForo_Model
 			'user_id' => $userId
 		));
 
-		$this->_getDb()
-			->query("UPDATE xf_liam_conversation_folder SET conversation_count=conversation_count+1 WHERE conversation_folder_id=?",
-				$conversationFolderId);
-
-		return true;
+		$this->rebuildFolderCounts();
 	}
 
 	public function removeConversationFromFolder($conversationId, $userId = null)
@@ -75,19 +77,13 @@ class ConversationFolder extends \XenForo_Model
 			$userId = \XenForo_Visitor::getUserId();
 		}
 
-		$conversationFolderId = $this->_getDb()
-			->fetchOne("SELECT conversation_folder_id FROM xf_liam_conversation_folder_relations WHERE conversation_id=? AND user_id=?",
-				array(
-					$conversationId,
-					$userId
-				));
-
-		$deleteClause = "conversation_id=$conversationId AND user_id={$userId}";
-		$this->_getDb()->delete('xf_liam_conversation_folder_relations', $deleteClause);
-
 		$this->_getDb()
-			->query("UPDATE xf_liam_conversation_folder SET conversation_count=conversation_count-1 WHERE conversation_folder_id=?",
-				$conversationFolderId);
+			->query('DELETE FROM xf_liam_conversation_folder_relations WHERE conversation_id=? AND user_id=?', array(
+				$conversationId,
+				$userId
+			));
+
+		$this->rebuildFolderCounts();
 	}
 
 	public function removeConversationFromAllFolders($conversationId)
@@ -100,7 +96,7 @@ class ConversationFolder extends \XenForo_Model
 
 	public function removeAllConversationsFromFolder($conversationFolderId)
 	{
-		$this->_getDb()->delete('xf_liam_conversation_folder_relations',
-			'conversation_folder_id = ' . $this->_getDb()->quote($conversationFolderId));
+		$this->_getDb()->query('DELETE FROM xf_liam_conversation_folder_relations WHERE conversation_folder_id=?',
+			$conversationFolderId);
 	}
 }
