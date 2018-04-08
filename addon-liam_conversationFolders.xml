@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon addon_id="liam_conversationFolders" title="Conversation Folders" version_string="1.1.0" version_id="10100" url="https://xf-liam.com/categories/conversation-folders.177/" install_callback_class="\LiamW\ConversationFolders\Installer" install_callback_method="install" uninstall_callback_class="\LiamW\ConversationFolders\Installer" uninstall_callback_method="uninstall">
+<addon addon_id="liam_conversationFolders" title="Conversation Folders" version_string="1.1.1" version_id="10101" url="https://xf-liam.com/categories/conversation-folders.177/" install_callback_class="\LiamW\ConversationFolders\Installer" install_callback_method="install" uninstall_callback_class="\LiamW\ConversationFolders\Installer" uninstall_callback_method="uninstall">
   <admin_navigation/>
   <admin_permissions/>
   <admin_style_properties/>
@@ -324,7 +324,7 @@ $0]]></replace>
     <modification template="conversation_list" modification_key="liam_conversationFolders_conversation_list_4" description="" execution_order="10" enabled="1" action="str_replace">
       <find><![CDATA[<xen:description>{xen:phrase conversations_allow_exchanging_messages}</xen:description>]]></find>
       <replace><![CDATA[<xen:if is="{$selectedFolder}">
-<xen:description>{xen:raw {$conversationFolders.{$selectedFolder}.description}}</xen:description>
+<xen:description>{$conversationFolders.{$selectedFolder}.description}</xen:description>
 <xen:else />
 $0
 </xen:if>]]></replace>

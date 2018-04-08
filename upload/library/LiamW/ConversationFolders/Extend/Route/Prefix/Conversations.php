@@ -6,7 +6,7 @@ class Conversations extends XFCP_Conversations
 {
 	public function match($routePath, \Zend_Controller_Request_Http $request, \XenForo_Router $router)
 	{
-		if (strpos($routePath, 'folder') !== false)
+		if (preg_match('/\.\d+\/folder\/?/', $routePath))
 		{
 			$action = $router->resolveActionWithIntegerParam($routePath, $request, 'conversation_folder_id');
 			$action = $router->resolveActionAsPageNumber($action, $request);

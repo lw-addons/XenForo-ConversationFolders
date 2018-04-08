@@ -132,7 +132,7 @@ class ConversationFolder extends \XenForo_Model
 
 			foreach ($this->getConversationFoldersWithAutoFileForUser($user['user_id']) as $conversationFolder)
 			{
-				if (preg_match($conversationFolder['auto_file_regex'], $conversationTitle))
+				if (@preg_match($conversationFolder['auto_file_regex'], $conversationTitle))
 				{
 					$this->addConversationToFolder($conversation['conversation_id'],
 						$conversationFolder['conversation_folder_id'], $user['user_id']);
