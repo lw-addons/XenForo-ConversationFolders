@@ -4,7 +4,7 @@ class LiamW_ConversationFolders_Extend_Route_Prefix_Conversations extends XFCP_L
 {
 	public function match($routePath, Zend_Controller_Request_Http $request, XenForo_Router $router)
 	{
-		if (preg_match('/\.\d+\/folder\/?/', $routePath))
+		if (preg_match('/\.?\d+\/folder\/?/', $routePath))
 		{
 			$action = $router->resolveActionWithIntegerParam($routePath, $request, 'conversation_folder_id');
 			$action = $router->resolveActionAsPageNumber($action, $request);

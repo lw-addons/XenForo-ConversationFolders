@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon addon_id="liam_conversationFolders" title="Conversation Folders" version_string="1.3.1" version_id="1030170" url="https://xf-liam.com/categories/conversation-folders.177/" install_callback_class="LiamW_ConversationFolders_Installer" install_callback_method="install" uninstall_callback_class="LiamW_ConversationFolders_Installer" uninstall_callback_method="uninstall">
+<addon addon_id="liam_conversationFolders" title="Conversation Folders" version_string="1.3.2" version_id="1030270" url="https://xf-liam.com/categories/conversation-folders.177/" install_callback_class="LiamW_ConversationFolders_Installer" install_callback_method="install" uninstall_callback_class="LiamW_ConversationFolders_Installer" uninstall_callback_method="uninstall">
   <admin_navigation/>
   <admin_permissions/>
   <admin_style_properties/>
@@ -67,6 +67,7 @@
     <phrase title="liam_conversationFolders_confirm_deletion_of_conversation_folder" version_id="10000" version_string="1.0.0"><![CDATA[Confirm deletion of conversation folder]]></phrase>
     <phrase title="liam_conversationFolders_delete_folder" version_id="10000" version_string="1.0.0"><![CDATA[Delete Folder]]></phrase>
     <phrase title="liam_conversationFolders_edit_folder" version_id="10000" version_string="1.0.0"><![CDATA[Edit Folder]]></phrase>
+    <phrase title="liam_conversationFolders_folder" version_id="1030170" version_string="1.3.1"><![CDATA[Folder]]></phrase>
     <phrase title="liam_conversationFolders_folder_description" version_id="10000" version_string="1.0.0"><![CDATA[Folder Description]]></phrase>
     <phrase title="liam_conversationFolders_folder_title" version_id="10000" version_string="1.0.0"><![CDATA[Folder Title]]></phrase>
     <phrase title="liam_conversationFolders_folder_tools" version_id="10000" version_string="1.0.0"><![CDATA[Folder Tools]]></phrase>
@@ -316,6 +317,32 @@
 	<input type="hidden" name="redirect" value="{$redirect}" />
 	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
 </form>]]></template>
+    <template title="liam_conversationFolders_move" version_id="1030170" version_string="1.3.1"><![CDATA[<xen:title>{xen:phrase liam_conversationFolders_move_conversation}: {$conversation.title}</xen:title>
+
+<form action="{xen:link 'conversations/move'}" method="post" class="xenForm formOverlay">
+	<dl class="ctrlUnit">
+		<dt><label for="ctrl_conversation_folder_id">{xen:phrase liam_conversationFolders_folder}:</label></dt>
+		<dd>
+			<select name="conversation_folder_id" class="textCtrl" id="ctrl_conversation_folder_id">
+				<option value="0">({xen:phrase liam_conversationFolders_no_folder})</option>
+				<xen:foreach loop="$conversationFolders" value="$conversationFolder">
+					<option value="{$conversationFolder.conversation_folder_id}" {xen:selected '{$conversation.conversation_folder_id} == {$conversationFolder.conversation_folder_id}'}>{$conversationFolder.title}</option>
+				</xen:foreach>
+			</select>
+		</dd>
+	</dl>
+
+	<dl class="ctrlUnit submitUnit">
+		<dt></dt>
+		<dd><input type="submit" name="save" value="{xen:phrase liam_conversationFolders_move_conversation}" accesskey="s" class="button primary" /></dd>
+	</dl>
+
+	<input type="hidden" name="conversation_id" value="{$conversation.conversation_id}" />
+
+	<input type="hidden" name="_xfConfirm" value="1" />
+	<input type="hidden" name="redirect" value="{$redirect}" />
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+</form>]]></template>
     <template title="liam_conversationFolders_wf_block" version_id="1020070" version_string="1.2.0"><![CDATA[<xen:if is="{$canUseConversationFolders}">
 	<xen:require css="liam_conversationFolders_block.css" />
 
@@ -356,9 +383,9 @@
 		</dl>]]></find>
       <replace><![CDATA[$0
 
-<xen:if is="{$canUseConversationFolders}">
+<xen:if is="{$canUseConversationFolders} && {$conversationFolders}">
 <dl class="ctrlUnit">
-	<dt><label for="ctrl_conversation_folder">{xen:phrase liam_conversationFolders}</label></dt>
+	<dt><label for="ctrl_conversation_folder">{xen:phrase liam_conversationFolders_folder}:</label></dt>
 	<dd>
 		<select name="conversation_folder_id" class="textCtrl" id="ctrl_conversation_folder">
 			<option value="0">({xen:phrase liam_conversationFolders_no_folder})</option>

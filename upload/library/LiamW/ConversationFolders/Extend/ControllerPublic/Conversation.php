@@ -274,12 +274,8 @@ class LiamW_ConversationFolders_Extend_ControllerPublic_Conversation extends XFC
 			XenForo_Input::UINT)
 		)
 		{
-			$viewParams['pageNavParams'] = array(
-				'_params' => array(
-					'conversation_folder_id' => $this->_input->filterSingle('conversation_folder_id',
-						XenForo_Input::UINT)
-				)
-			);
+			$viewParams['pageRoute'] = XenForo_Link::buildPublicLink('conversations/folder',
+				array('conversation_folder_id' => $conversationFolderId));
 		}
 
 		if (!isset($extraConditions['conversation_folder_id']) && !XenForo_Application::getOptions()->liam_conversationFolders_show_all)
